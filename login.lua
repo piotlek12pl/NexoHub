@@ -517,3 +517,11 @@ UserInputService.InputChanged:Connect(function(input)
         mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
 end)
+
+-- Jeśli AutoLogin wykrył poprawny klucz przy starcie skryptu
+if isAutoLogin then
+    -- Opóźnienie by poczekać aż UI wjedzie na środek ekranu
+    task.delay(0.6, function()
+        startInjectionSequence()
+    end)
+end
