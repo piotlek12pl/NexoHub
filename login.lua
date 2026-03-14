@@ -56,7 +56,7 @@ if isfile and isfile(KEY_FILE) then
 end
 -- ==========================================
 
--- Clean up poprzedniej wersji GUI
+-- Clean up poprzedniej wersji GUI i Blura
 local uiName = "NexoLogin"
 pcall(function() 
     if CoreGui:FindFirstChild(uiName) then 
@@ -68,8 +68,22 @@ pcall(function()
         player.PlayerGui[uiName]:Destroy() 
     end 
 end)
+pcall(function()
+    if game:GetService("Lighting"):FindFirstChild("NexoBlur") then
+        game:GetService("Lighting").NexoBlur:Destroy()
+    end
+end)
 
--- Main GUI
+-- Main GUI & Efekt Blur
+local blur = Instance.new("BlurEffect")
+blur.Name = "NexoBlur"
+blur.Size = 0
+blur.Parent = game:GetService("Lighting")
+
+TweenService:Create(blur, TweenInfo.new(0.6, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+    Size = 24
+}):Play()
+
 local gui = Instance.new("ScreenGui")
 gui.Name = uiName
 gui.ResetOnSpawn = false
@@ -122,12 +136,16 @@ closeBtn.MouseLeave:Connect(function()
     TweenService:Create(closeBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(150, 150, 150)}):Play()
 end)
 closeBtn.MouseButton1Click:Connect(function()
-    local tween = TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
+    -- Animacja ukrywania Blura
+    TweenService:Create(blur, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.In), { Size = 0 }):Play()
+    
+    local closeTween = TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
         GroupTransparency = 1,
         Position = UDim2.new(0.5, 0, 0.55, 0)
     })
-    tween:Play()
-    tween.Completed:Wait()
+    closeTween:Play()
+    closeTween.Completed:Wait()
+    blur:Destroy()
     gui:Destroy()
 end)
 
@@ -426,14 +444,16 @@ local function startInjectionSequence()
     displayStatus("Checking Game", 0.6)
     displayStatus("Injecting Modules", 0.6)
     
-    -- Zamykanie GUI
+    -- Zamykanie GUI przed skryptem gry
     local gameUrl = supportedGameIds[currentGameId]
+    TweenService:Create(blur, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.In), { Size = 0 }):Play()
     local closeTween = TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
         GroupTransparency = 1,
         Position = UDim2.new(0.5, 0, 0.55, 0)
     })
     closeTween:Play()
     closeTween.Completed:Wait()
+    blur:Destroy()
     gui:Destroy()
     
     -- Wykonanie loadstringa przypisanego do danej gry
