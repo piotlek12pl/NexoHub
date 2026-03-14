@@ -31,8 +31,10 @@ local supportedGameIds = {
 }
 
 -- ==========================================
--- AUTO LOGIN SYSTEM
+-- AUTO LOGIN (Definicje stanów)
 -- ==========================================
+local isAutoLogin = false
+local autoLoginGameUrl = nil
 if isfolder and not isfolder(KEY_FOLDER) then
     pcall(function() makefolder(KEY_FOLDER) end)
 end
@@ -42,33 +44,12 @@ if isfile and isfile(KEY_FILE) then
     pcall(function() savedKey = readfile(KEY_FILE) end)
     
     if savedKey and savedKey ~= "" then
-        print("[NexoHub] Znaleziono zapisany klucz, weryfikacja...")
+        print("[NexoHub] Found Saved Key!")
         if verifyKey(savedKey) then
-            print("[NexoHub] Klucz poprawny! Auto-ładowanie gry...")
-            local currentGameId = game.PlaceId
-            if not supportedGameIds[currentGameId] then
-                game.StarterGui:SetCore("SendNotification", {
-                    Title = "NexoHub",
-                    Text = "This Game is not Supported!\nCheck Discord for Supported Games",
-                    Duration = 10
-                })
-                return -- Zatrzymujemy skrypt - brak wsparcia
-            end
-            
-            local gameUrl = supportedGameIds[currentGameId]
-            game.StarterGui:SetCore("SendNotification", {
-                Title = "NexoHub AutoLogin",
-                Text = "Key valid! Injecting modules...",
-                Duration = 4
-            })
-            
-            task.delay(1, function()
-                loadstring(game:HttpGet(gameUrl))()
-            end)
-            
-            return -- Koniec skryptu, nie tworzymy okienka logowania!
+            print("[NexoHub] Loading Script..")
+            isAutoLogin = true
         else
-            print("[NexoHub] Klucz wygasł lub jest niepoprawny - usuwanie...")
+            print("[NexoHub] Key is Expired!")
             if delfile then pcall(function() delfile(KEY_FILE) end) end
         end
     end
@@ -316,7 +297,7 @@ getKeyBtn.MouseButton1Click:Connect(function()
     -- Przykład: setclipboard("https://link-to.net/1459465/nexohub-key")
     -- W Robloxie exploity obsługują setclipboard, ewentualnie otwierają link w oknie robloxa.
     pcall(function()
-        setclipboard("https://link-to.net/1459465/twoj-link-do-klucza")
+        setclipboard("https://direct-link.net/1108008/MKwkmFy9Evql")
     end)
     
     -- Informacja zwrotna na przycisku
@@ -362,6 +343,105 @@ local function displayStatus(text, duration)
     fadeOut.Completed:Wait()
 end
 
+local function startInjectionSequence()
+    -- Ukrywamy textbox i przyciski (Fade out + przesuwanie)
+    TweenService:Create(inputContainer, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0.5, 0, 0, 220)
+    }):Play()
+    TweenService:Create(inputBox, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+        TextTransparency = 1
+    }):Play()
+    TweenService:Create(inputStroke, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+        Transparency = 1
+    }):Play()
+    
+    TweenService:Create(submitBtn, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+        BackgroundTransparency = 1,
+        TextTransparency = 1,
+        Position = UDim2.new(0.5, 0, 0, 280)
+    }):Play()
+    
+    TweenService:Create(getKeyBtn, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+        BackgroundTransparency = 1,
+        TextTransparency = 1,
+        Position = UDim2.new(0.5, 0, 0, 330)
+    }):Play()
+    TweenService:Create(getKeyStroke, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+        Transparency = 1
+    }):Play()
+    
+    task.wait(0.5)
+    
+    inputContainer.Visible = false
+    submitBtn.Visible = false
+    getKeyBtn.Visible = false
+    
+    -- Sekwencja napisów (przyspieszona do 0.8s zamiast 1.5s)
+    displayStatus("Verifying License", 0.6)
+    
+    if isAutoLogin then
+        displayStatus("Saved Key Found", 0.6)    
+    end
+    
+    displayStatus("Bypassing Byfron", 0.6)
+    
+    -- Sprawdzanie czy gra jest wspierana
+    local currentGameId = game.PlaceId
+    if not supportedGameIds[currentGameId] then
+        -- Gra NIE jest wspierana
+        statusLabel.Text = ""
+        statusLabel.TextTransparency = 1
+        
+        -- Napis o braku wsparcia
+        local unsupportedLabel = Instance.new("TextLabel")
+        unsupportedLabel.Name = "UnsupportedLabel"
+        unsupportedLabel.Size = UDim2.new(0.9, 0, 0, 60)
+        unsupportedLabel.Position = UDim2.new(0.5, 0, 0, 220)
+        unsupportedLabel.AnchorPoint = Vector2.new(0.5, 0)
+        unsupportedLabel.BackgroundTransparency = 1
+        unsupportedLabel.Text = "This Game is not Supported!\nCheck Discord for Supported Games"
+        unsupportedLabel.TextColor3 = Color3.fromRGB(255, 45, 65)
+        unsupportedLabel.TextSize = 14
+        unsupportedLabel.Font = Enum.Font.GothamBold
+        unsupportedLabel.TextWrapped = true
+        unsupportedLabel.TextTransparency = 1
+        unsupportedLabel.Parent = mainFrame
+        
+        -- Animacja pojawienia się
+        TweenService:Create(unsupportedLabel, TweenInfo.new(0.4), {TextTransparency = 0}):Play()
+        
+        -- Po 4 sekundach zamykamy GUI
+        task.wait(4)
+        local closeTween = TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
+            GroupTransparency = 1,
+            Position = UDim2.new(0.5, 0, 0.55, 0)
+        })
+        closeTween:Play()
+        closeTween.Completed:Wait()
+        gui:Destroy()
+        return
+    end
+    
+    displayStatus("Checking Game", 0.6)
+    displayStatus("Injecting Modules", 0.6)
+    
+    -- Zamykanie GUI
+    local gameUrl = supportedGameIds[currentGameId]
+    local closeTween = TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
+        GroupTransparency = 1,
+        Position = UDim2.new(0.5, 0, 0.55, 0)
+    })
+    closeTween:Play()
+    closeTween.Completed:Wait()
+    gui:Destroy()
+    
+    -- Wykonanie loadstringa przypisanego do danej gry
+    if gameUrl then
+        loadstring(game:HttpGet(gameUrl))()
+    end
+end
+
 submitBtn.MouseButton1Click:Connect(function()
     -- Opcjonalny efekt kliknięcia (pulsowanie)
     local clickTween = TweenService:Create(submitBtn, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
@@ -385,97 +465,7 @@ submitBtn.MouseButton1Click:Connect(function()
                 writefile(KEY_FILE, inputBox.Text)
             end)
         end
-        -- Ukrywamy textbox i przyciski (Fade out + przesuwanie)
-        TweenService:Create(inputContainer, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-            BackgroundTransparency = 1,
-            Position = UDim2.new(0.5, 0, 0, 220)
-        }):Play()
-        TweenService:Create(inputBox, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-            TextTransparency = 1
-        }):Play()
-        TweenService:Create(inputStroke, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-            Transparency = 1
-        }):Play()
-        
-        TweenService:Create(submitBtn, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-            BackgroundTransparency = 1,
-            TextTransparency = 1,
-            Position = UDim2.new(0.5, 0, 0, 280)
-        }):Play()
-        
-        TweenService:Create(getKeyBtn, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-            BackgroundTransparency = 1,
-            TextTransparency = 1,
-            Position = UDim2.new(0.5, 0, 0, 330)
-        }):Play()
-        TweenService:Create(getKeyStroke, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-            Transparency = 1
-        }):Play()
-        
-        task.wait(0.5)
-        
-        inputContainer.Visible = false
-        submitBtn.Visible = false
-        getKeyBtn.Visible = false
-        
-        -- Sekwencja napisów (przyspieszona do 0.8s zamiast 1.5s)
-        displayStatus("Verifying License", 0.8)
-        displayStatus("Bypassing Byfron", 0.8)
-        
-        -- Sprawdzanie czy gra jest wspierana
-        local currentGameId = game.PlaceId
-        if not supportedGameIds[currentGameId] then
-            -- Gra NIE jest wspierana
-            statusLabel.Text = ""
-            statusLabel.TextTransparency = 1
-            
-            -- Napis o braku wsparcia
-            local unsupportedLabel = Instance.new("TextLabel")
-            unsupportedLabel.Name = "UnsupportedLabel"
-            unsupportedLabel.Size = UDim2.new(0.9, 0, 0, 60)
-            unsupportedLabel.Position = UDim2.new(0.5, 0, 0, 220)
-            unsupportedLabel.AnchorPoint = Vector2.new(0.5, 0)
-            unsupportedLabel.BackgroundTransparency = 1
-            unsupportedLabel.Text = "This Game is not Supported!\nCheck Discord for Supported Games"
-            unsupportedLabel.TextColor3 = Color3.fromRGB(255, 45, 65)
-            unsupportedLabel.TextSize = 14
-            unsupportedLabel.Font = Enum.Font.GothamBold
-            unsupportedLabel.TextWrapped = true
-            unsupportedLabel.TextTransparency = 1
-            unsupportedLabel.Parent = mainFrame
-            
-            -- Animacja pojawienia się
-            TweenService:Create(unsupportedLabel, TweenInfo.new(0.4), {TextTransparency = 0}):Play()
-            
-            -- Po 4 sekundach zamykamy GUI
-            task.wait(4)
-            local closeTween = TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
-                GroupTransparency = 1,
-                Position = UDim2.new(0.5, 0, 0.55, 0)
-            })
-            closeTween:Play()
-            closeTween.Completed:Wait()
-            gui:Destroy()
-            return
-        end
-        
-        displayStatus("Checking Game", 0.8)
-        displayStatus("Injecting Modules", 0.8)
-        
-        -- Zamykanie GUI
-        local gameUrl = supportedGameIds[currentGameId]
-        local closeTween = TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
-            GroupTransparency = 1,
-            Position = UDim2.new(0.5, 0, 0.55, 0)
-        })
-        closeTween:Play()
-        closeTween.Completed:Wait()
-        gui:Destroy()
-        
-        -- Wykonanie loadstringa przypisanego do danej gry
-        if gameUrl then
-            loadstring(game:HttpGet(gameUrl))()
-        end
+        startInjectionSequence()
     else
         -- Zły klucz (efekt trzęsienia)
         local originalPos = inputContainer.Position
