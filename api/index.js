@@ -147,36 +147,41 @@ module.exports = async (req, res) => {
     }
   }
 
-  // === TRYB 2: Strona z kluczem (po przejściu Linkvertise) ===
+  // === TRYB DIAGNOSTYCZNY (TYMCZASOWY) ===
+  // Pokazuje wszystkie parametry URL i nagłówki, żebyśmy wiedzieli co Linkvertise wysyła
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
 
-  // Sprawdzamy czy jest token od Linkvertise
-  // Linkvertise dodaje parametry do URL po przekierowaniu
-  const token = req.query.token || req.query.r || req.query.o || null;
-  
-  if (!token) {
-    // Brak tokenu = ktoś wszedł bezpośrednio w link, bez Linkvertise
-    return res.status(403).send(getErrorHTML(
-      "No Linkvertise callback token detected.<br>You must complete the Linkvertise steps first to receive your key."
-    ));
-  }
+  const allParams = JSON.stringify(req.query, null, 2);
+  const referer = req.headers.referer || req.headers.referrer || 'brak';
+  const fullUrl = req.url || 'brak';
 
-  // Weryfikujemy token przez API Linkvertise
-  try {
-    const isValid = await verifyLinkvertiseToken(token);
-    
-    if (isValid) {
-      // Token prawidłowy — pokazujemy klucz!
-      return res.status(200).send(getSuccessHTML(currentKey));
-    } else {
-      // Token nieprawidłowy
-      return res.status(403).send(getErrorHTML(
-        "The Linkvertise callback token is invalid or has expired.<br>Please try going through Linkvertise again."
-      ));
-    }
-  } catch (err) {
-    return res.status(500).send(getErrorHTML(
-      "An error occurred while verifying your callback. Please try again."
-    ));
-  }
+  return res.status(200).send(`
+  <!DOCTYPE html>
+  <html lang="pl">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>NexoHub - DEBUG</title>
+      <style>
+          body { font-family: 'Segoe UI', monospace; background-color: #0d0d0e; color: #0f0; padding: 40px; }
+          h1 { color: #ff2d41; }
+          pre { background: #111; padding: 20px; border-radius: 8px; border: 1px solid #333; overflow-x: auto; color: #0f0; font-size: 14px; }
+          .label { color: #aaa; margin-top: 20px; margin-bottom: 5px; }
+      </style>
+  </head>
+  <body>
+      <h1>🔍 NexoHub Debug Mode</h1>
+      <p>Poniżej znajdziesz wszystkie dane które przyszły od Linkvertise. Skopiuj to i wyślij mi!</p>
+      
+      <p class="label">Full URL:</p>
+      <pre>${fullUrl}</pre>
+      
+      <p class="label">Query Parameters:</p>
+      <pre>${allParams}</pre>
+      
+      <p class="label">Referer:</p>
+      <pre>${referer}</pre>
+  </body>
+  </html>
+  `);
 };
