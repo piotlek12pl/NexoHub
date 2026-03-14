@@ -2,14 +2,78 @@ local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
+local HttpService = game:GetService("HttpService")
 
 local player = Players.LocalPlayer
+
+-- System Zapisywania Kluczy
+local KEY_FOLDER = "NexoHub"
+local KEY_FILE = KEY_FOLDER .. "/key.txt"
+
+-- Funkcja weryfikująca klucz API
+local function verifyKey(key)
+    local keyValid = false
+    local verifyUrl = "https://nexo-hub-phi.vercel.app/api?verify=" .. HttpService:UrlEncode(key)
+    pcall(function()
+        local response = game:HttpGet(verifyUrl)
+        local data = HttpService:JSONDecode(response)
+        if data and data.valid == true then
+            keyValid = true
+        end
+    end)
+    return keyValid
+end
 
 -- Lista wspieranych gier (Game ID -> loadstring URL)
 local supportedGameIds = {
     [118637423917462] = "https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/caseparadise.lua",
     [70390793715007] = "https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/hooked.lua",
 }
+
+-- ==========================================
+-- AUTO LOGIN SYSTEM
+-- ==========================================
+if isfolder and not isfolder(KEY_FOLDER) then
+    pcall(function() makefolder(KEY_FOLDER) end)
+end
+
+if isfile and isfile(KEY_FILE) then
+    local savedKey = nil
+    pcall(function() savedKey = readfile(KEY_FILE) end)
+    
+    if savedKey and savedKey ~= "" then
+        print("[NexoHub] Znaleziono zapisany klucz, weryfikacja...")
+        if verifyKey(savedKey) then
+            print("[NexoHub] Klucz poprawny! Auto-ładowanie gry...")
+            local currentGameId = game.PlaceId
+            if not supportedGameIds[currentGameId] then
+                game.StarterGui:SetCore("SendNotification", {
+                    Title = "NexoHub",
+                    Text = "This Game is not Supported!\nCheck Discord for Supported Games",
+                    Duration = 10
+                })
+                return -- Zatrzymujemy skrypt - brak wsparcia
+            end
+            
+            local gameUrl = supportedGameIds[currentGameId]
+            game.StarterGui:SetCore("SendNotification", {
+                Title = "NexoHub AutoLogin",
+                Text = "Key valid! Injecting modules...",
+                Duration = 4
+            })
+            
+            task.delay(1, function()
+                loadstring(game:HttpGet(gameUrl))()
+            end)
+            
+            return -- Koniec skryptu, nie tworzymy okienka logowania!
+        else
+            print("[NexoHub] Klucz wygasł lub jest niepoprawny - usuwanie...")
+            if delfile then pcall(function() delfile(KEY_FILE) end) end
+        end
+    end
+end
+-- ==========================================
 
 -- Clean up poprzedniej wersji GUI
 local uiName = "NexoLogin"
@@ -310,18 +374,17 @@ submitBtn.MouseButton1Click:Connect(function()
         }):Play()
     end)
     
-    -- Weryfikacja klucza przez API Vercel
-    local keyValid = false
-    local verifyUrl = "https://nexo-hub-phi.vercel.app/api?verify=" .. game:GetService("HttpService"):UrlEncode(inputBox.Text)
-    pcall(function()
-        local response = game:HttpGet(verifyUrl)
-        local data = game:GetService("HttpService"):JSONDecode(response)
-        if data and data.valid == true then
-            keyValid = true
-        end
-    end)
+    -- Weryfikacja klucza funkcją API
+    local keyValid = verifyKey(inputBox.Text)
     
     if keyValid then
+        -- ZAPIS KLUCZA PO POPRAWNYM ZALOGOWANIU
+        if writefile then
+            pcall(function()
+                if isfolder and not isfolder(KEY_FOLDER) then makefolder(KEY_FOLDER) end
+                writefile(KEY_FILE, inputBox.Text)
+            end)
+        end
         -- Ukrywamy textbox i przyciski (Fade out + przesuwanie)
         TweenService:Create(inputContainer, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
             BackgroundTransparency = 1,
