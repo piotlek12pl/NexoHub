@@ -7,11 +7,13 @@ const STAGE_2_LINK = "https://link-center.net/1108008/RVJqaSOOpHPX"; // Link do 
 // =========================
 
 // Funkcje pomocnicze
-function getDailyKey() {
+function getDailyKey(ipAddress = "") {
   const date = new Date();
   const dateString = `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}`;
   let hash = 0;
-  const str = dateString + SECRET_SALT;
+  // Dodajemy IP do stringa mieszającego. Każde IP dostanie inny klucz dla danego dnia.
+  const str = dateString + SECRET_SALT + ipAddress;
+  
   for (let i = 0; i < str.length; i++) {
     hash = ((hash << 5) - hash) + str.charCodeAt(i);
     hash |= 0;
@@ -168,7 +170,12 @@ module.exports = async (req, res) => {
   
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const currentKey = getDailyKey();
+  // Pobranie IP klienta (działa bezpiecznie za proxy Vercela)
+  const rawIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+  const clientIp = rawIp.split(',')[0].trim();
+
+  // Generujemy unikalny klucz dla DANEGO IP (IP-Lock)
+  const currentKey = getDailyKey(clientIp);
 
   // === TRYB 1: Weryfikacja klucza w Roblox ===
   if (req.query.verify) {
