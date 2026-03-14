@@ -1,8 +1,0 @@
-{
-  "name": "nexohub-key-system",
-  "version": "1.0.0",
-  "scripts": {
-    "start": "node api/generateKey.js"
-  },
-  "dependencies": {}
-}
