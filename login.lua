@@ -520,7 +520,12 @@ end)
 
 -- Jeśli AutoLogin wykrył poprawny klucz przy starcie skryptu
 if isAutoLogin then
-    -- Opóźnienie by poczekać aż UI wjedzie na środek ekranu
+    -- Natychmiastowe ukrycie zbędnych elementów przed startem wyjazdu
+    inputContainer.Visible = false
+    submitBtn.Visible = false
+    getKeyBtn.Visible = false
+    
+    -- Wywołanie z lekkim opóźnieniem by animacja bazowa UI Frame się skończyła
     task.delay(0.6, function()
         startInjectionSequence()
     end)
