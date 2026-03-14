@@ -1,11 +1,8 @@
-// api/index.js — NexoHub Key System with Linkvertise Callback Verification
+// api/index.js — NexoHub Key System with Linkvertise Referer Verification
 // Vercel Serverless Function
 
-const https = require('https');
-
 // ===== KONFIGURACJA =====
-const LINKVERTISE_USER_ID = 1459465; // Twoje ID z Linkvertise
-const SECRET_SALT = "NEXOHUB_SECRET_SALT_2026"; // Tajny klucz do generowania kluczy
+const SECRET_SALT = "NEXOHUB_SECRET_SALT_2026";
 // =========================
 
 // Generuje unikalny klucz na dany dzień
@@ -21,42 +18,6 @@ function getDailyKey() {
   }
   
   return "NEXO-" + Math.abs(hash).toString(16).toUpperCase();
-}
-
-// Weryfikuje token Linkvertise przez ich API
-function verifyLinkvertiseToken(token) {
-  return new Promise((resolve, reject) => {
-    const url = `https://publisher.linkvertise.com/api/v1/redirect/link/static/${LINKVERTISE_USER_ID}?token=${encodeURIComponent(token)}`;
-    
-    https.get(url, (resp) => {
-      let data = '';
-      resp.on('data', (chunk) => { data += chunk; });
-      resp.on('end', () => {
-        try {
-          const json = JSON.parse(data);
-          // Linkvertise zwraca obiekt z informacją czy token jest valid
-          if (json && json.data && json.data.completed === true) {
-            resolve(true);
-          } else if (resp.statusCode === 200) {
-            // Jeśli status 200 i mamy dane to traktujemy jako valid
-            resolve(true);
-          } else {
-            resolve(false);
-          }
-        } catch (e) {
-          // Jeśli odpowiedź nie jest JSONem ale status 200, może być OK
-          if (resp.statusCode === 200) {
-            resolve(true);
-          } else {
-            resolve(false);
-          }
-        }
-      });
-    }).on('error', (err) => {
-      // Jeśli API Linkvertise jest nieosiągalne, odrzucamy
-      resolve(false);
-    });
-  });
 }
 
 // Strona HTML z kluczem (sukces)
@@ -86,7 +47,7 @@ function getSuccessHTML(key) {
           <div class="checkmark">✅</div>
           <h1>Verification Complete!</h1>
           <p class="subtitle">Here is your daily access key (expires in 24h):</p>
-          <div class="key-box" onclick="navigator.clipboard.writeText('${key}');this.style.borderColor='#00ff88';document.getElementById('hint').textContent='Copied!'">${key}</div>
+          <div class="key-box" onclick="navigator.clipboard.writeText('${key}');this.style.borderColor='#00ff88';document.getElementById('hint').textContent='Copied to clipboard!'">${key}</div>
           <p class="copy-hint" id="hint">Click the key to copy it</p>
           <p class="info">Paste this key into the executor and click Submit.</p>
       </div>
@@ -95,7 +56,7 @@ function getSuccessHTML(key) {
   `;
 }
 
-// Strona HTML z błędem (nieprawidłowy callback)
+// Strona HTML z błędem
 function getErrorHTML(message) {
   return `
   <!DOCTYPE html>
@@ -103,7 +64,7 @@ function getErrorHTML(message) {
   <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>NexoHub - Error</title>
+      <title>NexoHub - Access Denied</title>
       <style>
           * { margin: 0; padding: 0; box-sizing: border-box; }
           body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0d0d0e; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
@@ -117,9 +78,9 @@ function getErrorHTML(message) {
   <body>
       <div class="container">
           <div class="error-icon">❌</div>
-          <h1>Invalid Callback</h1>
+          <h1>Access Denied</h1>
           <p class="message">${message}</p>
-          <p class="info">Please complete the Linkvertise steps to get your key.</p>
+          <p class="info">Please use the Get Key button in the executor to get your key.</p>
       </div>
   </body>
   </html>
@@ -147,41 +108,19 @@ module.exports = async (req, res) => {
     }
   }
 
-  // === TRYB DIAGNOSTYCZNY (TYMCZASOWY) ===
-  // Pokazuje wszystkie parametry URL i nagłówki, żebyśmy wiedzieli co Linkvertise wysyła
+  // === TRYB 2: Strona z kluczem ===
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
 
-  const allParams = JSON.stringify(req.query, null, 2);
-  const referer = req.headers.referer || req.headers.referrer || 'brak';
-  const fullUrl = req.url || 'brak';
-
-  return res.status(200).send(`
-  <!DOCTYPE html>
-  <html lang="pl">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>NexoHub - DEBUG</title>
-      <style>
-          body { font-family: 'Segoe UI', monospace; background-color: #0d0d0e; color: #0f0; padding: 40px; }
-          h1 { color: #ff2d41; }
-          pre { background: #111; padding: 20px; border-radius: 8px; border: 1px solid #333; overflow-x: auto; color: #0f0; font-size: 14px; }
-          .label { color: #aaa; margin-top: 20px; margin-bottom: 5px; }
-      </style>
-  </head>
-  <body>
-      <h1>🔍 NexoHub Debug Mode</h1>
-      <p>Poniżej znajdziesz wszystkie dane które przyszły od Linkvertise. Skopiuj to i wyślij mi!</p>
-      
-      <p class="label">Full URL:</p>
-      <pre>${fullUrl}</pre>
-      
-      <p class="label">Query Parameters:</p>
-      <pre>${allParams}</pre>
-      
-      <p class="label">Referer:</p>
-      <pre>${referer}</pre>
-  </body>
-  </html>
-  `);
+  // Sprawdzamy Referer — czy użytkownik przyszedł z Linkvertise
+  const referer = (req.headers.referer || req.headers.referrer || '').toLowerCase();
+  
+  if (referer.includes('linkvertise.com') || referer.includes('link-to.net') || referer.includes('link-center.net') || referer.includes('link-target.net')) {
+    // Użytkownik przyszedł z Linkvertise — pokazujemy klucz!
+    return res.status(200).send(getSuccessHTML(currentKey));
+  } else {
+    // Brak referera z Linkvertise — blokujemy dostęp
+    return res.status(403).send(getErrorHTML(
+      "Direct access is not allowed.<br>You must complete the Linkvertise steps to receive your key."
+    ));
+  }
 };
