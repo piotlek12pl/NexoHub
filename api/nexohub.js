@@ -58,7 +58,7 @@ function getLandingHTML() {
             opacity: 0.12;
             animation: float 10s ease-in-out infinite;
         }
-        .bg-orb-1 { width: 500px; height: 500px; background: #ef4444; top: -150px; left: -150px; }
+        .bg-orb-1 { width: 500px; height: 500px; background: #f59e0b; top: -150px; left: -150px; }
         .bg-orb-2 { width: 350px; height: 350px; background: #f97316; bottom: -100px; right: -100px; animation-delay: -5s; }
         .bg-orb-3 { width: 250px; height: 250px; background: #8b5cf6; top: 40%; right: 10%; animation-delay: -3s; }
 
@@ -144,12 +144,12 @@ function getLandingHTML() {
             position: absolute;
             top: 0; left: 0; right: 0;
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.3), transparent);
+            background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.3), transparent);
         }
 
         .code-block:hover {
-            border-color: rgba(239, 68, 68, 0.3);
-            background: rgba(239, 68, 68, 0.03);
+            border-color: rgba(245, 158, 11, 0.3);
+            background: rgba(245, 158, 11, 0.03);
         }
 
         .code-block:active {
@@ -208,15 +208,15 @@ function getLandingHTML() {
 
         .step-num {
             width: 24px; height: 24px;
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.15);
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.15);
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 11px;
             font-weight: 700;
-            color: #ef4444;
+            color: #f59e0b;
         }
 
         .warning {
