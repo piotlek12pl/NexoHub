@@ -13,10 +13,25 @@ local KEY_FILE = KEY_FOLDER .. "/key.txt"
 local function getGameName()
     local gid = tostring(game.GameId)
     local pid = tostring(game.PlaceId)
+    local actualName = "Unknown Game"
     
-    if gid == "70390793715007" or pid == "70390793715007" then return "Hooked!" end
-    if gid == "118637423917462" or pid == "118637423917462" then return "Case Paradise" end
-    return "Unknown Game"
+    -- Próba pobrania prawdziwej nazwy gry z serwerów Roblox (najpewniejsza metoda)
+    pcall(function()
+        local info = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId)
+        actualName = info.Name
+    end)
+    
+    -- Debug w konsoli F9 dla Ciebie (możesz sprawdzić co skrypt widzi)
+    warn("[NexoHub] Debug - GameId: " .. gid .. " | PlaceId: " .. pid .. " | Name: " .. actualName)
+    
+    if gid == "70390793715007" or pid == "70390793715007" or actualName:find("Hooked") then 
+        return "Hooked!" 
+    end
+    if gid == "118637423917462" or pid == "118637423917462" or actualName:find("Case Paradise") then 
+        return "Case Paradise" 
+    end
+    
+    return actualName
 end
 
 -- Funkcja weryfikująca klucz API
