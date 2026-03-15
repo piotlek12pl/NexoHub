@@ -1,3 +1,8 @@
+if getgenv().Nexo_Authorized ~= "NexoHub_Session_Success" then
+    game:GetService("Players").LocalPlayer:Kick("\n\n[Nexo Security]\nUnauthorized execution detected.\nPlease execute the script via the official loader.\ndsc.gg/nexohub")
+    return
+end
+
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
@@ -85,7 +90,7 @@ do
 
     local JumpPowerSlider = Tabs.LocalPlayer:AddSlider("JP_Slider", {
         Title = "Jump Power",
-        Description = "Zmień wysokość swojego skoku",
+        Description = "Change your jump height",
         Default = 50,
         Min = 50,
         Max = 500,
@@ -122,7 +127,7 @@ do
 
     local NoclipSpeedSlider = Tabs.LocalPlayer:AddSlider("NoclipSpeedSlider", {
         Title = "Noclip Speed",
-        Description = "Prędkość latania",
+        Description = "Flying speed",
         Default = 50,
         Min = 10,
         Max = 300,
@@ -1533,9 +1538,9 @@ do
                                             elseif (actionVal == "Play" or actionVal == "Win" or actionVal == "Battle") and not didBattle then
                                                 didBattle = true
                                                 
-                                                -- Oczekiwanie przynajmniej 3 sekund przed próbą ponownego stworzenia bitwy
+                                                -- Waiting at least 3 seconds before trying to create a battle again
                                                 if os.clock() - lastBattleAttempt < 3 then
-                                                    continue -- Czekamy do 3 sekund (cooldown)
+                                                    continue -- Wait for cooldown (3 seconds)
                                                 end
                                                 lastBattleAttempt = os.clock()
                                                 
@@ -1573,16 +1578,16 @@ do
                                                     if battleId then
                                                         pcall(function() print("[Nexo Hub] Battle Created! ID: " .. tostring(battleId)) end)
                                                         
-                                                        -- FIX DLA GUI CRASHA W NATIVE SKRYPCIE - Cichy update wartości id
+                                                        -- FIX FOR GUI CRASH IN NATIVE SCRIPT - Silent ID update
                                                         pcall(function()
                                                             local bIdVal = DynamicPlayer.PlayerGui:FindFirstChild("Windows") and DynamicPlayer.PlayerGui.Windows:FindFirstChild("Case Battles") and DynamicPlayer.PlayerGui.Windows["Case Battles"]:FindFirstChild("BattlesScript") and DynamicPlayer.PlayerGui.Windows["Case Battles"].BattlesScript:FindFirstChild("BattleId")
                                                             if bIdVal then bIdVal.Value = tonumber(battleId) end
                                                         end)
                                                         
-                                                        task.wait(0.6) -- Oczekanie sekunde upewniajac sie ze serwer poprawnie nadał uprawnienia bitwy
+                                                        task.wait(0.6) -- Wait a second to ensure server correctly assigned battle permissions
                                                         
                                                         if addBotRemote then
-                                                            pcall(function() print("[Nexo Hub] Spawning Bot do ID: " .. tostring(battleId)) end)
+                                                            pcall(function() print("[Nexo Hub] Spawning Bot for ID: " .. tostring(battleId)) end)
                                                             pcall(function()
                                                                 addBotRemote:FireServer(tonumber(battleId), DynamicPlayer)
                                                             end)
@@ -1595,7 +1600,7 @@ do
                                                         AutoQuestsToggle:SetValue(false)
                                                     end
                                                 else
-                                                    Fluent:Notify({Title="Error", Content="Could not find CreateBattle lub cheapest case.", Duration=5})
+                                                    Fluent:Notify({Title="Error", Content="Could not find CreateBattle or cheapest case.", Duration=5})
                                                     AutoQuestsToggle:SetValue(false)
                                                 end
                                             end
@@ -1688,7 +1693,7 @@ do
                 local casesFrame = playerGui and playerGui:FindFirstChild("Windows") and playerGui.Windows:FindFirstChild("Cases") and playerGui.Windows.Cases:FindFirstChild("CasesFrame")
                 
                 if casesFrame then
-                    -- Pobierz poziom gracza
+                    -- Get player level
                     local currentLevel = 0
                     local success, LevelCalculator = pcall(function()
                         return require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("LevelCalculator"))
@@ -1703,14 +1708,14 @@ do
                         end
                     end
 
-                    -- Przeszukaj wszystkie frame'y "LevelCases" (może być ich kilka)
+                    -- Search all "LevelCases" folders (there might be multiple)
                     for _, levelCasesFolder in ipairs(casesFrame:GetChildren()) do
                         if levelCasesFolder.Name == "LevelCases" then
-                            -- Przeszukaj konkretne poziomy (LEVEL10, LEVEL20, LEVELS100 itd.)
+                            -- Search specific levels (LEVEL10, LEVEL20, LEVELS100 etc.)
                             for _, caseFrame in ipairs(levelCasesFolder:GetChildren()) do
                                 if not autoLevelRewardsEnabled then break end
                                 
-                                -- Wyciągnij numer poziomu z nazwy (np. "LEVEL10" -> 10, "LEVELS110" -> 110)
+                                -- Extract level number from name (e.g. "LEVEL10" -> 10, "LEVELS110" -> 110)
                                 local levelReq = tonumber(caseFrame.Name:match("%d+"))
                                 
                                 if levelReq and currentLevel >= levelReq then
@@ -1718,15 +1723,15 @@ do
                                     if caseCostLabel and caseCostLabel:IsA("TextLabel") then
                                         local costText = caseCostLabel.Text
                                         
-                                        -- Jeśli tekst NIE jest w formacie "mm:ss" (np. "05:20"), to znaczy że można odebrać
-                                        -- Szukamy wzorca cyfra cyfra : cyfra cyfra
+                                        -- If text is NOT in "mm:ss" format (e.g. "05:20"), it means it can be claimed
+                                        -- Searching for pattern digit digit : digit digit
                                         local isTimer = costText:match("%d+:%d+")
                                         
                                         if not isTimer then
-                                            -- Wyślij sygnał otwarcia (podajemy nazwę frame'a jako nazwę skrzynki)
-                                            -- Zazwyczaj nazwa skrzynki to LEVEL10, LEVEL20 itd.
+                                            -- Send open signal (use frame name as case name)
+                                            -- Usually case name is LEVEL10, LEVEL20 etc.
                                             local caseName = caseFrame.Name
-                                            -- Jeśli nazwa to np. LEVELS110, serwer może oczekiwać LEVEL110
+                                            -- If name is e.g. LEVELS110, server might expect LEVEL110
                                             if caseName:find("LEVELS") then
                                                 caseName = caseName:gsub("LEVELS", "LEVEL")
                                             end
@@ -1734,7 +1739,7 @@ do
                                             pcall(function()
                                                 openCaseRemote:InvokeServer(caseName, 1, false, false)
                                             end)
-                                            task.wait(7) -- 7 sekund opóźnienia między skrzynkami (zgodnie z prośbą)
+                                            task.wait(7) -- 7 seconds delay between cases
                                         end
                                     end
                                 end
@@ -1803,7 +1808,7 @@ task.spawn(function()
                             if developerTag.Text ~= "[ ★  Nexo User ★ ]" or not developerTag.Visible then
                                 developerTag.Text = "[ ★  Nexo User ★ ]"
                                 developerTag.Visible = true
-                                developerTag.TextColor3 = Color3.fromRGB(255, 170, 0) -- Złoty kolor Nexo
+                                developerTag.TextColor3 = Color3.fromRGB(255, 170, 0) -- Nexo Golden color
                             end
                         end
                     end
@@ -2210,13 +2215,13 @@ task.spawn(function()
                 local levelData = LevelCalculator.CalculateLevel(expValue.Value)
                 if levelData and levelData.Level then
                     print("--------------------------------------------------")
-                    print("🚀 [NEXO HUB] Wczytano statystyki gracza!")
-                    print("🚀 [NEXO HUB] Twój poziom w grze to: " .. tostring(levelData.Level))
+                    print("🚀 [NEXO HUB] Player statistics loaded!")
+                    print("🚀 [NEXO HUB] Your game level is: " .. tostring(levelData.Level))
                     print("--------------------------------------------------")
                     
                     Fluent:Notify({
-                        Title = "Witaj ponownie!",
-                        Content = "Twój aktualny poziom w grze to: " .. tostring(levelData.Level),
+                        Title = "Welcome back!",
+                        Content = "Your current game level is: " .. tostring(levelData.Level),
                         Duration = 5
                     })
                 end
