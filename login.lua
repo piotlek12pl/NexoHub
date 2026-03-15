@@ -11,11 +11,11 @@ local KEY_FOLDER = "NexoHub"
 local KEY_FILE = KEY_FOLDER .. "/key.txt"
 
 local function getGameName()
-    local id1 = game.GameId
-    local id2 = game.PlaceId
+    local gid = tostring(game.GameId)
+    local pid = tostring(game.PlaceId)
     
-    if id1 == 70390793715007 or id2 == 70390793715007 then return "Hooked" end
-    if id1 == 118637423917462 or id2 == 118637423917462 then return "Case Paradise" end
+    if gid == "70390793715007" or pid == "70390793715007" then return "Hooked!" end
+    if gid == "118637423917462" or pid == "118637423917462" then return "Case Paradise" end
     return "Unknown Game"
 end
 
