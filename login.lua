@@ -139,10 +139,7 @@ local corner = Instance.new("UICorner")
 corner.CornerRadius = UDim.new(0, 14)
 corner.Parent = mainFrame
 
-local frameStroke = Instance.new("UIStroke")
-frameStroke.Color = Color3.fromRGB(245, 158, 11) -- Bursztynowa ramka główna
-frameStroke.Thickness = 1.5
-frameStroke.Parent = mainFrame
+-- Usunięto obramowanie główne na prośbę użytkownika
 
 -- Przycisk zamykania 'X'
 local closeBtn = Instance.new("TextButton")
@@ -272,10 +269,18 @@ fingerIcon.Position = UDim2.new(0, 10, 0.5, 0)
 fingerIcon.AnchorPoint = Vector2.new(0, 0.5)
 fingerIcon.BackgroundTransparency = 1
 fingerIcon.Image = "rbxassetid://1482708142906146856" -- Będzie podmienione na obrazek z linku poprzez proxy Robloxa (lub asset id jeśli dostępne)
-fingerIcon.ImageTransparency = 0.4
--- Używamy bezpośredniego linku jeśli executor wspiera (wiele wspiera)
+fingerIcon.ImageTransparency = 0.2
+-- Większość exploitów obsługuje pobieranie obrazków przez getcustomasset lub bezpośrednie linki
 pcall(function()
-    fingerIcon.Image = "https://cdn.discordapp.com/attachments/1442178184861716622/1482708142906146856/fingerprint_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png?ex=69b7ef10&is=69b69d90&hm=b39091794d2b9dcf7486601877e38b4f6bbb19751ca55c77575c9272f222b008&"
+    if getcustomasset then
+        -- Jeśli executor wspiera pobieranie do plików
+        local fileName = "fox_finger.png"
+        writefile(fileName, game:HttpGet("https://cdn.discordapp.com/attachments/1442178184861716622/1482708142906146856/fingerprint_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png?ex=69b7ef10&is=69b69d90&hm=b39091794d2b9dcf7486601877e38b4f6bbb19751ca55c77575c9272f222b008&"))
+        fingerIcon.Image = getcustomasset(fileName)
+    else
+        -- Próba bezpośrednia (może nie działać na każdym)
+        fingerIcon.Image = "https://cdn.discordapp.com/attachments/1442178184861716622/1482708142906146856/fingerprint_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png?ex=69b7ef10&is=69b69d90&hm=b39091794d2b9dcf7486601877e38b4f6bbb19751ca55c77575c9272f222b008&"
+    end
 end)
 fingerIcon.Parent = inputContainer
 
@@ -306,8 +311,8 @@ end)
 -- Przycisk Authenticate (Outline Mode)
 local submitBtn = Instance.new("TextButton")
 submitBtn.Name = "SubmitButton"
-submitBtn.Size = UDim2.new(0.85, 0, 0, 50)
-submitBtn.Position = UDim2.new(0.5, 0, 0, 275)
+submitBtn.Size = UDim2.new(0.85, 0, 0, 45) -- Nieco mniejszy, by starczyło miejsca
+submitBtn.Position = UDim2.new(0.5, 0, 0, 270)
 submitBtn.AnchorPoint = Vector2.new(0.5, 0)
 submitBtn.BackgroundTransparency = 1 -- Brak wypełnienia
 submitBtn.Text = "AUTHENTICATE"
@@ -331,7 +336,7 @@ submitCorner.Parent = submitBtn
 local getKeyBtn = Instance.new("TextButton")
 getKeyBtn.Name = "GetKeyButton"
 getKeyBtn.Size = UDim2.new(0.85, 0, 0, 30)
-getKeyBtn.Position = UDim2.new(0.5, 0, 0, 320)
+getKeyBtn.Position = UDim2.new(0.5, 0, 0, 325) -- Obniżony o 5px, by nie nachodził
 getKeyBtn.AnchorPoint = Vector2.new(0.5, 0)
 getKeyBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 22)
 getKeyBtn.Text = "Get Key"
@@ -520,7 +525,7 @@ submitBtn.MouseButton1Click:Connect(function()
     clickTween:Play()
     clickTween.Completed:Connect(function()
         TweenService:Create(submitBtn, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0.85, 0, 0, 50)
+            Size = UDim2.new(0.85, 0, 0, 45)
         }):Play()
     end)
     
