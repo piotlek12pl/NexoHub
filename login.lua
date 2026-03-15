@@ -513,6 +513,7 @@ local function startInjectionSequence()
     
     -- Wykonanie loadstringa przypisanego do danej gry
     if gameUrl then
+        getgenv().Nexo_Authorized = "NexoHub_Session_Success"
         loadstring(game:HttpGet(gameUrl))()
     end
 end
