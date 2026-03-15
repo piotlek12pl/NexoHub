@@ -17,7 +17,7 @@ function getDailyKey(ipAddress = "") {
   let hash = 0;
   // Dodajemy IP do stringa mieszającego. Każde IP dostanie inny klucz dla danego dnia.
   const str = dateString + SECRET_SALT + ipAddress;
-  
+
   for (let i = 0; i < str.length; i++) {
     hash = ((hash << 5) - hash) + str.charCodeAt(i);
     hash |= 0;
@@ -28,7 +28,7 @@ function getDailyKey(ipAddress = "") {
 function parseCookies(cookieHeader) {
   const list = {};
   if (!cookieHeader) return list;
-  cookieHeader.split(`;`).forEach(function(cookie) {
+  cookieHeader.split(`;`).forEach(function (cookie) {
     let [name, ...rest] = cookie.split(`=`);
     name = name?.trim();
     if (!name) return;
@@ -47,7 +47,7 @@ function getProgressBarHTML(activeStage) {
   const isC1 = activeStage >= 1;
   const isC2 = activeStage >= 2;
   const isC3 = activeStage >= 3;
-  
+
   return `
     <div class="progress-steps">
         <div class="p-step ${isC1 ? 'active' : ''}">
@@ -100,6 +100,126 @@ function getStage1CompleteHTML() {
         <h1>Stage 1 Complete!</h1>
         <p class="subtitle">Complete the final stage to unlock your daily key.</p>
         <a href="${STAGE_2_LINK}" class="btn">Proceed to Stage 2</a>
+    </div>
+</body>
+</html>`;
+}
+
+// Główna strona NexoHub (Landing Page)
+function getLandingPageHTML() {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexoHub — The Ultimate Scripting Experience</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { 
+            background: #0b0c0e; 
+            color: #fff; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            background-image: radial-gradient(circle at 50% 0%, #291e0b 0%, #0b0c0e 60%);
+            overflow-x: hidden;
+        }
+        
+        .container { width: 100%; max-width: 1000px; padding: 40px 20px; text-align: center; }
+        
+        /* Hero Section */
+        h1 { 
+            font-size: clamp(40px, 10vw, 84px); 
+            font-weight: 800; 
+            letter-spacing: -2px; 
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(245, 158, 11, 0.3);
+            text-transform: uppercase;
+        }
+        .subtitle { color: #828282; font-size: 18px; margin-bottom: 50px; }
+        
+        /* Stats Section */
+        .stats-wrap { display: flex; gap: 30px; justify-content: center; margin-bottom: 60px; flex-wrap: wrap; }
+        .stat-item { display: flex; align-items: center; gap: 12px; text-align: left; background: rgba(255,255,255,0.02); padding: 12px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        .stat-icon { width: 40px; height: 40px; background: rgba(245, 158, 11, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
+        .stat-info .label { color: #6b7280; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-info .val { font-size: 20px; font-weight: 700; color: #fff; }
+
+        /* Buttons */
+        .btn-row { display: flex; gap: 16px; justify-content: center; margin-bottom: 80px; flex-wrap: wrap; }
+        .btn-main { background: #f59e0b; color: #000; padding: 16px 32px; border-radius: 12px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; transition: 0.2s; box-shadow: 0 0 20px rgba(245, 158, 11, 0.2); }
+        .btn-main:hover { transform: translateY(-3px); box-shadow: 0 0 30px rgba(245, 158, 11, 0.4); }
+        .btn-sec { background: rgba(255,255,255,0.03); color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 16px 32px; border-radius: 12px; font-weight: 600; text-decoration: none; transition: 0.2s; }
+        .btn-sec:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2); }
+
+        /* Feature Cards */
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; width: 100%; margin-top: 20px; }
+        .feat-card { background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 40px; text-align: center; transition: 0.3s; }
+        .feat-card:hover { border-color: rgba(245, 158, 11, 0.2); background: rgba(245, 158, 11, 0.02); }
+        .feat-icon { width: 50px; height: 50px; background: rgba(245, 158, 11, 0.1); border-radius: 12px; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; color: #f59e0b; }
+        .feat-card h3 { font-size: 20px; margin-bottom: 12px; }
+        .feat-card p { color: #828282; font-size: 15px; line-height: 1.6; }
+
+        footer { margin-top: 100px; color: #4b5563; font-size: 13px; padding-bottom: 40px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>NEXO HUB</h1>
+        <p class="subtitle">The Ultimate Scripting Experience for Roblox.</p>
+        
+        <div class="stats-wrap">
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                </div>
+                <div class="stat-info">
+                    <div class="label">Uptime</div>
+                    <div class="val">99.9% (324 Days)</div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                </div>
+                <div class="stat-info">
+                    <div class="label">Last Detection</div>
+                    <div class="val">NEVER</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-row">
+            <a href="https://direct-link.net/1108008/MKwkmFy9Evql" class="btn-main">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                Get Script
+            </a>
+            <a href="/api/nexohub" class="btn-sec">Supported Games</a>
+            <a href="https://discord.gg/nexohub" class="btn-sec">Discord</a>
+        </div>
+
+        <div class="features">
+            <div class="feat-card">
+                <div class="feat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+                <h3>Undetected & Safe</h3>
+                <p>Advanced bypass methods ensure your account stays completely safe from anti-cheats.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg></div>
+                <h3>Fast Updates</h3>
+                <p>Scripts are updated almost instantly whenever games push new patches.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg></div>
+                <h3>Premium Features</h3>
+                <p>Unlock overpowered and highly requested features exclusive to our Hub.</p>
+            </div>
+        </div>
+
+        <footer>© 2026 Nexo Hub. All rights reserved.</footer>
     </div>
 </body>
 </html>`;
@@ -177,7 +297,7 @@ function getSuccessHTML(key, clientIp) {
         <div class="header-wrap">
             <div class="discord-btn">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>
-                Discord FREE
+                Discord Free Key
             </div>
         </div>
 
@@ -228,9 +348,9 @@ function getSuccessHTML(key, clientIp) {
             Go to Scripts
         </a>
 
-        <a href="/api?reset=true" class="btn-dark" onclick="return confirm('Resetting HWID will clear your access and require you to get a new key. Proceed?');">
+        <a href="/api?reset=true" class="btn-dark" onclick="return confirm('Resetting IP-LOCK will clear your access and require you to get a new key. Proceed?');">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
-            Transfer Device (Reset HWID)
+            Transfer Device (Reset IP-LOCK)
         </a>
 
     </div>
@@ -299,7 +419,7 @@ module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
-  
+
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   // Pobranie IP klienta (działa bezpiecznie za proxy Vercela)
@@ -312,12 +432,12 @@ module.exports = async (req, res) => {
   // === TRYB 1: Weryfikacja klucza w Roblox ===
   if (req.query.verify) {
     if (req.query.verify === currentKey) {
-      
+
       // Zapisujemy prawdziwość wykonywania bezpośrednio z hookowanego klienta
       const exec = req.query.executor || "Unknown";
       const game = req.query.game || "Unknown";
       recentActivity.set(clientIp, { executor: exec, game: game });
-      
+
       return res.status(200).json({ valid: true });
     } else {
       return res.status(403).json({ valid: false });
@@ -341,7 +461,7 @@ module.exports = async (req, res) => {
     if (hasUsedReset) {
       return res.status(403).send(getErrorHTML("You have already reset your HWID today. Please wait until tomorrow."));
     }
-    
+
     // Udzielono resetu: 
     // - Wyczyszczono etap 1 (zmuszamy do zrobienia Linkvertise od nowa dla nowego IP)
     // - Ustawiono blokadę resetu na 24 godziny
@@ -351,12 +471,12 @@ module.exports = async (req, res) => {
     const clearStageOptions = [
       'HttpOnly', 'Secure', 'SameSite=Lax', 'Path=/', 'Max-Age=0'
     ];
-    
+
     res.setHeader('Set-Cookie', [
       `nexohub_reset_used=true; ${resetCookieOptions.join('; ')}`,
       `nexohub_stage_1=; ${clearStageOptions.join('; ')}`
     ]);
-    
+
     // Przenosimy użykownika od razu do 1 etapu z powiadomieniem
     return res.status(200).send(`
       <script>
@@ -368,6 +488,12 @@ module.exports = async (req, res) => {
 
   // WERYFIKACJA PÓŁ-OSTATECZNA REFERERÓW
   if (!isFromLinkvertise) {
+    // Jeśli to zwykłe wejście z przeglądarki (bez parametrów), pokazujemy Landing Page
+    if (!req.query.verify && !req.query.reset && !req.query.stage2) {
+      return res.status(200).send(getLandingPageHTML());
+    }
+    
+    // Jeśli próbuje wejść w proces bez referera (obejście)
     return res.status(403).send(getErrorHTML("Direct skipping is blocked.<br>You must go through the executor's Get Key process."));
   }
 
@@ -379,7 +505,7 @@ module.exports = async (req, res) => {
     ];
     res.setHeader('Set-Cookie', `nexohub_stage_1=passed; ${options.join('; ')}`);
     return res.status(200).send(getStage1CompleteHTML());
-  } 
+  }
   else {
     // ETAP 2 ZALICZONY -> Sukces, dajemy klucz. Pamiętamy zablokowanie powrotu do Etapu 2 po klucz za darmo po paru minutach.
     res.setHeader('Set-Cookie', 'nexohub_stage_1=; Max-Age=0; Path=/; HttpOnly; Secure');
