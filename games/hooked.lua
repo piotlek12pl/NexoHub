@@ -1,3 +1,8 @@
+if getgenv().Nexo_Authorized ~= "NexoHub_Session_Success" then
+    game:GetService("Players").LocalPlayer:Kick("\n\n[Nexo Security]\nUnauthorized execution detected.\nPlease execute the script via the official loader.\ndsc.gg/nexohub")
+    return
+end
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local VirtualUser = game:GetService("VirtualUser")
