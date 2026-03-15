@@ -78,16 +78,16 @@ function getStage1CompleteHTML() {
         /* Progress Steps */
         .progress-steps { display: flex; align-items: center; justify-content: center; margin-bottom: 50px; }
         .p-step { width: 48px; height: 48px; border-radius: 50%; background: #131b1c; border: 2px solid #1c2727; display: flex; align-items: center; justify-content: center; color: #3b4e4e; transition: 0.3s; }
-        .p-step.active { border-color: #213f38; background: #0f2420; color: #10a37f; box-shadow: 0 0 20px rgba(16, 163, 127, 0.15); }
+        .p-step.active { border-color: #78350f; background: #451a03; color: #f59e0b; box-shadow: 0 0 20px rgba(245, 158, 11, 0.15); }
         .p-step svg { width: 22px; height: 22px; }
         .p-line { width: 80px; height: 2px; background: #1c2727; margin: 0 10px; transition: 0.3s; }
-        .p-line.active { background: #213f38; }
+        .p-line.active { background: #78350f; }
 
         h1 { font-size: 26px; text-align: center; margin-bottom: 12px; font-weight: 700; }
         .subtitle { text-align: center; color: #828282; font-size: 15px; margin-bottom: 40px; }
         
-        .btn { display: block; width: 100%; background: #10a37f; color: #000; text-align: center; padding: 16px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 16px; transition: 0.2s; box-shadow: 0 4px 15px rgba(16, 163, 127, 0.2); }
-        .btn:hover { background: #0e8f6e; transform: translateY(-2px); }
+        .btn { display: block; width: 100%; background: #f59e0b; color: #000; text-align: center; padding: 16px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 16px; transition: 0.2s; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2); }
+        .btn:hover { background: #d97706; transform: translateY(-2px); }
     </style>
 </head>
 <body>
@@ -116,19 +116,19 @@ function getSuccessHTML(key, clientIp) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: #0b0c0e; color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; background-image: radial-gradient(circle at 50% 0%, #15221c 0%, #0b0c0e 60%); }
+        body { background: #0b0c0e; color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; background-image: radial-gradient(circle at 50% 0%, #291e0b 0%, #0b0c0e 60%); }
         .card { width: 100%; max-width: 520px; padding: 40px; }
 
         /* Progress Steps */
         .progress-steps { display: flex; align-items: center; justify-content: center; margin-bottom: 40px; }
         .p-step { width: 56px; height: 56px; border-radius: 50%; background: #131b1c; border: 2px solid #1c2727; display: flex; align-items: center; justify-content: center; color: #3b4e4e; }
-        .p-step.active { border-color: #213f38; background: #0f2420; color: #1bd99b; box-shadow: 0 0 20px rgba(27, 217, 155, 0.15); }
+        .p-step.active { border-color: #78350f; background: #451a03; color: #f59e0b; box-shadow: 0 0 20px rgba(245, 158, 11, 0.15); }
         .p-step svg { width: 24px; height: 24px; }
         .p-line { width: 90px; height: 2px; background: #1c2727; margin: 0 8px; }
-        .p-line.active { background: #213f38; }
+        .p-line.active { background: #78350f; }
 
         /* Header Info */
-        .discord-btn { display: inline-flex; align-items: center; gap: 8px; background: rgba(27, 217, 155, 0.1); color: #1bd99b; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; border: 1px solid rgba(27, 217, 155, 0.2); letter-spacing: 0.5px; margin-bottom: 24px; }
+        .discord-btn { display: inline-flex; align-items: center; gap: 8px; background: rgba(245, 158, 11, 0.1); color: #f59e0b; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; border: 1px solid rgba(245, 158, 11, 0.2); letter-spacing: 0.5px; margin-bottom: 24px; }
         .discord-btn svg { width: 14px; height: 14px; }
         
         .header-wrap { text-align: center; }
@@ -137,17 +137,17 @@ function getSuccessHTML(key, clientIp) {
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
         .box { background: #0e1112; border: 1px solid #1a1e20; border-radius: 12px; padding: 20px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .box-title { color: #6b7280; font-size: 10px; font-weight: 700; letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase; }
-        .box-val { color: #1bd99b; font-size: 18px; font-weight: 700; font-family: monospace; }
+        .box-val { color: #f59e0b; font-size: 18px; font-weight: 700; font-family: monospace; }
         .box-val-gray { color: #d1d5db; font-size: 14px; font-weight: 600; font-family: monospace; display: flex; align-items: center; gap: 6px; }
         
         /* License Key Container */
-        .lic-container { background: #0a0e0c; border: 1px dashed #1da376; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 24px; position: relative; }
+        .lic-container { background: #0a0e0c; border: 1px dashed #f59e0b; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 24px; position: relative; }
         .lic-title { color: #6b7280; font-size: 10px; font-weight: 700; letter-spacing: 1px; margin-bottom: 12px; text-transform: uppercase; }
-        .lic-key { color: #1bd99b; font-size: 24px; font-weight: 800; letter-spacing: 3px; font-family: monospace; }
+        .lic-key { color: #f59e0b; font-size: 24px; font-weight: 800; letter-spacing: 3px; font-family: monospace; }
         
         /* Buttons */
-        .btn-green { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; background: #1bd99b; color: #000; border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(27, 217, 155, 0.2); text-decoration: none; }
-        .btn-green:hover { background: #16b782; transform: translateY(-2px); }
+        .btn-green { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; background: #f59e0b; color: #000; border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2); text-decoration: none; }
+        .btn-green:hover { background: #d97706; transform: translateY(-2px); }
         
         .btn-dark { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; background: #131517; color: #fff; border: 1px solid #272a2e; padding: 16px; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.2s; text-decoration: none; }
         .btn-dark:hover { background: #1c1f22; border-color: #3b4046; }
@@ -157,7 +157,7 @@ function getSuccessHTML(key, clientIp) {
         .section-title { color: #6b7280; font-size: 11px; font-weight: 700; letter-spacing: 1px; margin-bottom: 12px; text-transform: uppercase; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
         .stat-box { display: flex; align-items: center; gap: 12px; background: #0e1112; border: 1px solid #1a1e20; border-radius: 10px; padding: 14px; }
-        .stat-icon { color: #1bd99b; width: 24px; height: 24px; }
+        .stat-icon { color: #f59e0b; width: 24px; height: 24px; }
         .stat-label { color: #6b7280; font-size: 9px; font-weight: 700; text-transform: uppercase; margin-bottom: 3px; }
         .stat-text { color: #fff; font-size: 14px; font-weight: 700; }
 
@@ -183,7 +183,7 @@ function getSuccessHTML(key, clientIp) {
                 <div class="box-title">Bound Hardware (HWID)</div>
                 <div class="box-val-gray">
                     ${maskedIp} 
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1bd99b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </div>
             </div>
         </div>
