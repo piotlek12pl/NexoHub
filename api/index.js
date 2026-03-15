@@ -6,6 +6,10 @@ const SECRET_SALT = "NEXOHUB_SECRET_SALT_2026";
 const STAGE_2_LINK = "https://link-center.net/1108008/RVJqaSOOpHPX"; // Link do drugiego etapu Linkvertise
 // =========================
 
+// Szybka pamięć podręczna Vercela ratująca przed tworzeniem bazy danych
+// (działa ok. 15-30 minut w zależności od obciążenia Vercela)
+const recentActivity = new Map();
+
 // Funkcje pomocnicze
 function getDailyKey(ipAddress = "") {
   const date = new Date();
@@ -103,6 +107,9 @@ function getStage1CompleteHTML() {
 
 // Ekran dla ukończonego STAGE 2 (Premium Dashboard)
 function getSuccessHTML(key, clientIp) {
+  // Odczyt statystyk z gorącej pamięci serwera
+  const stats = recentActivity.get(clientIp) || { game: 'Awaiting execution...', executor: '-' };
+
   // Maskowanie IP a.b.c.d -> a.b.***.***
   const ipParts = clientIp.split('.');
   const maskedIp = (ipParts.length === 4) ? ipParts[0] + "." + ipParts[1] + ".***.***" : clientIp.substring(0, 10) + "...";
@@ -204,14 +211,14 @@ function getSuccessHTML(key, clientIp) {
                 <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2" ry="2"></rect><path d="M6 12h4"></path><path d="M8 10v4"></path><path d="M15 13h.01"></path><path d="M18 11h.01"></path></svg>
                 <div>
                     <div class="stat-label">Last Game</div>
-                    <div class="stat-text">Case Paradise</div>
+                    <div class="stat-text">${stats.game}</div>
                 </div>
             </div>
             <div class="stat-box">
                 <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
                 <div>
                     <div class="stat-label">Executor</div>
-                    <div class="stat-text">Xeno</div>
+                    <div class="stat-text">${stats.executor}</div>
                 </div>
             </div>
         </div>
@@ -305,6 +312,12 @@ module.exports = async (req, res) => {
   // === TRYB 1: Weryfikacja klucza w Roblox ===
   if (req.query.verify) {
     if (req.query.verify === currentKey) {
+      
+      // Zapisujemy prawdziwość wykonywania bezpośrednio z hookowanego klienta
+      const exec = req.query.executor || "Unknown";
+      const game = req.query.game || "Unknown";
+      recentActivity.set(clientIp, { executor: exec, game: game });
+      
       return res.status(200).json({ valid: true });
     } else {
       return res.status(403).json({ valid: false });
