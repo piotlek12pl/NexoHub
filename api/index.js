@@ -163,11 +163,45 @@ function getLandingPageHTML() {
         .feat-card h3 { font-size: 20px; margin-bottom: 12px; }
         .feat-card p { color: #828282; font-size: 15px; line-height: 1.6; }
 
+        /* Embed Style (Discord Like) */
+        .embed { 
+            background: #15171a; 
+            border-left: 4px solid #f59e0b; 
+            border-radius: 4px; 
+            padding: 20px; 
+            text-align: left; 
+            width: 100%; 
+            max-width: 480px; 
+            margin: 40px auto; 
+            position: relative;
+            display: none; /* Hidden by default, shown via JS */
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .embed-header { display: flex; align-items: center; gap: 8px; color: #fff; font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+        .embed-header svg { width: 18px; height: 18px; }
+        .embed-subtitle { color: #d1d5db; font-size: 14px; margin-bottom: 16px; }
+        .embed-title { color: #fff; font-size: 14px; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .embed-title .dot { width: 12px; height: 12px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 10px #22c55e; }
+        
+        .game-list { border-left: 2px solid #272a2e; padding-left: 12px; margin-bottom: 20px; }
+        .game-entry { margin-bottom: 8px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+        .game-entry .name { color: #5865f2; font-weight: 700; text-decoration: none; }
+        .game-entry .status { background: #000; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        
+        .dev-section { background: #000; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; color: #5865f2; font-family: monospace; font-size: 14px; }
+        
+        .embed-footer { display: flex; align-items: center; gap: 8px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px; color: #9ca3af; font-size: 12px; }
+        .footer-icon { width: 20px; height: 20px; background: #f59e0b; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; }
+        
+        .torch-img { position: absolute; right: 20px; top: 20px; width: 64px; height: 64px; border-radius: 8px; }
+
         footer { margin-top: 100px; color: #4b5563; font-size: 13px; padding-bottom: 40px; }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="main-view">
         <h1>NEXO HUB</h1>
         <p class="subtitle">The Ultimate Scripting Experience for Roblox.</p>
         
@@ -178,7 +212,7 @@ function getLandingPageHTML() {
                 </div>
                 <div class="stat-info">
                     <div class="label">Uptime</div>
-                    <div class="val">99.9% (324 Days)</div>
+                    <div class="val">99.9%</div>
                 </div>
             </div>
             <div class="stat-item">
@@ -193,12 +227,38 @@ function getLandingPageHTML() {
         </div>
 
         <div class="btn-row">
-            <a href="https://direct-link.net/1108008/MKwkmFy9Evql" class="btn-main">
+            <a href="https://nexohub-new.vercel.app/api/nexohub" class="btn-main">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
                 Get Script
             </a>
-            <a href="/api/nexohub" class="btn-sec">Supported Games</a>
+            <a href="javascript:void(0)" class="btn-sec" onclick="showEmbed()">Supported Games</a>
             <a href="https://discord.gg/nexohub" class="btn-sec">Discord</a>
+        </div>
+
+        <div class="embed" id="games-embed">
+            <div class="embed-header">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S19.17 9 20 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                SCRIPT LIBRARY
+            </div>
+            <div class="embed-subtitle">Current status of supported games.</div>
+            
+            <img src="https://raw.githubusercontent.com/piotlek12pl/NexoHub/main/assets/torch.png" class="torch-img" alt="">
+
+            <div class="embed-title"><div class="dot"></div> ACTIVE SCRIPTS</div>
+            <div class="game-list">
+                <div class="game-entry"><span class="name">Case Paradise</span> <span class="status">STABLE</span></div>
+                <div class="game-entry"><span class="name">Hooked!</span> <span class="status">STABLE</span></div>
+            </div>
+
+            <div class="embed-title">🔨 IN DEVELOPMENT</div>
+            <div class="dev-section">
+                - More games coming soon...
+            </div>
+
+            <div class="embed-footer">
+                <div class="footer-icon">🔥</div>
+                Total Scripts: 2 • Last Updated: 15/03
+            </div>
         </div>
 
         <div class="features">
@@ -221,6 +281,16 @@ function getLandingPageHTML() {
 
         <footer>© 2026 Nexo Hub. All rights reserved.</footer>
     </div>
+
+    <script>
+        function showEmbed() {
+            const embed = document.getElementById('games-embed');
+            embed.style.display = embed.style.display === 'block' ? 'none' : 'block';
+            if(embed.style.display === 'block') {
+                embed.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    </script>
 </body>
 </html>`;
 }
@@ -492,7 +562,7 @@ module.exports = async (req, res) => {
     if (!req.query.verify && !req.query.reset && !req.query.stage2) {
       return res.status(200).send(getLandingPageHTML());
     }
-    
+
     // Jeśli próbuje wejść w proces bez referera (obejście)
     return res.status(403).send(getErrorHTML("Direct skipping is blocked.<br>You must go through the executor's Get Key process."));
   }
