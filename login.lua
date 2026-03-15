@@ -40,7 +40,7 @@ local function verifyKey(key)
     local executorName = identifyexecutor and identifyexecutor() or "Unknown Executor"
     local gameName = getGameName()
     
-    local verifyUrl = "https://nexo-hub-phi.vercel.app/api?verify=" .. HttpService:UrlEncode(key) .. "&executor=" .. HttpService:UrlEncode(executorName) .. "&game=" .. HttpService:UrlEncode(gameName)
+    local verifyUrl = "https://nexohub-new.vercel.app/api?verify=" .. HttpService:UrlEncode(key) .. "&executor=" .. HttpService:UrlEncode(executorName) .. "&game=" .. HttpService:UrlEncode(gameName)
     
     pcall(function()
         local response = game:HttpGet(verifyUrl)
@@ -140,8 +140,8 @@ corner.CornerRadius = UDim.new(0, 14)
 corner.Parent = mainFrame
 
 local frameStroke = Instance.new("UIStroke")
-frameStroke.Color = Color3.fromRGB(35, 35, 38)
-frameStroke.Thickness = 1
+frameStroke.Color = Color3.fromRGB(245, 158, 11) -- Bursztynowa ramka główna
+frameStroke.Thickness = 1.5
 frameStroke.Parent = mainFrame
 
 -- Przycisk zamykania 'X'
@@ -192,7 +192,7 @@ avatarCorner.CornerRadius = UDim.new(1, 0)
 avatarCorner.Parent = avatarBg
 
 local avatarStroke = Instance.new("UIStroke")
-avatarStroke.Color = Color3.fromRGB(255, 45, 65) -- Czerwona obwódka jak na zdjęciu
+avatarStroke.Color = Color3.fromRGB(245, 158, 11) -- Bursztynowa obwódka
 avatarStroke.Thickness = 2
 avatarStroke.Parent = avatarBg
 
@@ -238,7 +238,7 @@ adminLabel.AnchorPoint = Vector2.new(0.5, 0)
 adminLabel.BackgroundTransparency = 1
 if player.Name == "piotlek12pl" then
     adminLabel.Text = "ADMIN"
-    adminLabel.TextColor3 = Color3.fromRGB(255, 45, 65)
+    adminLabel.TextColor3 = Color3.fromRGB(245, 158, 11)
 else
     adminLabel.Text = "USER"
     adminLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
@@ -261,15 +261,29 @@ inputCorner.CornerRadius = UDim.new(0, 8)
 inputCorner.Parent = inputContainer
 
 local inputStroke = Instance.new("UIStroke")
-inputStroke.Color = Color3.fromRGB(45, 45, 50)
+inputStroke.Color = Color3.fromRGB(35, 35, 38)
 inputStroke.Thickness = 1
 inputStroke.Parent = inputContainer
 
+local fingerIcon = Instance.new("ImageLabel")
+fingerIcon.Name = "FingerprintIcon"
+fingerIcon.Size = UDim2.new(0, 20, 0, 20)
+fingerIcon.Position = UDim2.new(0, 10, 0.5, 0)
+fingerIcon.AnchorPoint = Vector2.new(0, 0.5)
+fingerIcon.BackgroundTransparency = 1
+fingerIcon.Image = "rbxassetid://1482708142906146856" -- Będzie podmienione na obrazek z linku poprzez proxy Robloxa (lub asset id jeśli dostępne)
+fingerIcon.ImageTransparency = 0.4
+-- Używamy bezpośredniego linku jeśli executor wspiera (wiele wspiera)
+pcall(function()
+    fingerIcon.Image = "https://cdn.discordapp.com/attachments/1442178184861716622/1482708142906146856/fingerprint_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png?ex=69b7ef10&is=69b69d90&hm=b39091794d2b9dcf7486601877e38b4f6bbb19751ca55c77575c9272f222b008&"
+end)
+fingerIcon.Parent = inputContainer
+
 local inputBox = Instance.new("TextBox")
 inputBox.Name = "InputField"
-inputBox.Size = UDim2.new(1, -30, 1, 0)
-inputBox.Position = UDim2.new(0.5, 0, 0.5, 0)
-inputBox.AnchorPoint = Vector2.new(0.5, 0.5)
+inputBox.Size = UDim2.new(1, -50, 1, 0)
+inputBox.Position = UDim2.new(0, 40, 0.5, 0)
+inputBox.AnchorPoint = Vector2.new(0, 0.5)
 inputBox.BackgroundTransparency = 1
 inputBox.Text = ""
 inputBox.PlaceholderText = "License Key"
@@ -277,34 +291,40 @@ inputBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 125)
 inputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 inputBox.TextSize = 14
 inputBox.Font = Enum.Font.GothamMedium
-inputBox.TextXAlignment = Enum.TextXAlignment.Center
+inputBox.TextXAlignment = Enum.TextXAlignment.Left
 inputBox.ClearTextOnFocus = false
 inputBox.Parent = inputContainer
 
 -- Animacja dla Pola Tekstowego (Czerwona obwódka po kliknięciu)
 inputBox.Focused:Connect(function()
-    TweenService:Create(inputStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(255, 45, 65)}):Play()
+    TweenService:Create(inputStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(245, 158, 11)}):Play()
 end)
 inputBox.FocusLost:Connect(function()
-    TweenService:Create(inputStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(45, 45, 50)}):Play()
+    TweenService:Create(inputStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(35, 35, 38)}):Play()
 end)
 
--- Przycisk Submit
+-- Przycisk Authenticate (Outline Mode)
 local submitBtn = Instance.new("TextButton")
 submitBtn.Name = "SubmitButton"
-submitBtn.Size = UDim2.new(0.85, 0, 0, 40)
-submitBtn.Position = UDim2.new(0.5, 0, 0, 270)
+submitBtn.Size = UDim2.new(0.85, 0, 0, 50)
+submitBtn.Position = UDim2.new(0.5, 0, 0, 275)
 submitBtn.AnchorPoint = Vector2.new(0.5, 0)
-submitBtn.BackgroundColor3 = Color3.fromRGB(255, 45, 65) -- Czerwony nowoczesny
-submitBtn.Text = "Submit"
-submitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-submitBtn.TextSize = 14
+submitBtn.BackgroundTransparency = 1 -- Brak wypełnienia
+submitBtn.Text = "AUTHENTICATE"
+submitBtn.TextColor3 = Color3.fromRGB(245, 158, 11)
+submitBtn.TextSize = 13
 submitBtn.Font = Enum.Font.GothamBold
-submitBtn.AutoButtonColor = false -- Własna animacja hover
+submitBtn.AutoButtonColor = false
 submitBtn.Parent = mainFrame
 
+local submitStroke = Instance.new("UIStroke")
+submitStroke.Color = Color3.fromRGB(245, 158, 11)
+submitStroke.Thickness = 1.5
+submitStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+submitStroke.Parent = submitBtn
+
 local submitCorner = Instance.new("UICorner")
-submitCorner.CornerRadius = UDim.new(0, 8)
+submitCorner.CornerRadius = UDim.new(0, 10)
 submitCorner.Parent = submitBtn
 
 -- Przycisk Get Key
@@ -349,7 +369,7 @@ getKeyBtn.MouseButton1Click:Connect(function()
     -- Informacja zwrotna na przycisku
     local oldText = getKeyBtn.Text
     getKeyBtn.Text = "Link copied to clipboard!"
-    TweenService:Create(getKeyBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(45, 255, 100)}):Play()
+    TweenService:Create(getKeyBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(245, 158, 11)}):Play()
     
     task.delay(2, function()
         getKeyBtn.Text = oldText
@@ -373,10 +393,12 @@ statusLabel.Parent = mainFrame
 
 -- Animacja Hover dla przycisku Submit
 submitBtn.MouseEnter:Connect(function()
-    TweenService:Create(submitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 65, 85)}):Play()
+    TweenService:Create(submitStroke, TweenInfo.new(0.2), {Thickness = 2.5, Color = Color3.fromRGB(255, 215, 0)}):Play()
+    TweenService:Create(submitBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(255, 215, 0)}):Play()
 end)
 submitBtn.MouseLeave:Connect(function()
-    TweenService:Create(submitBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 45, 65)}):Play()
+    TweenService:Create(submitStroke, TweenInfo.new(0.2), {Thickness = 1.5, Color = Color3.fromRGB(245, 158, 11)}):Play()
+    TweenService:Create(submitBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(245, 158, 11)}):Play()
 end)
 
 local function displayStatus(text, duration)
@@ -498,7 +520,7 @@ submitBtn.MouseButton1Click:Connect(function()
     clickTween:Play()
     clickTween.Completed:Connect(function()
         TweenService:Create(submitBtn, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0.85, 0, 0, 40)
+            Size = UDim2.new(0.85, 0, 0, 50)
         }):Play()
     end)
     
