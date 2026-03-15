@@ -36,27 +36,27 @@ do
 
 
     Tabs.Main:AddParagraph({
-        Title = "Detection",
-        Content = "Status of Exloit: Under Development 🔵"
+        Title = "UPTIME",
+        Content = "99.9% (Stable) 🟢"
     })
 
     Tabs.Main:AddParagraph({
-        Title = "Social Media",
-        Content = "Join our Discord for Updates! dsc.gg/soon 💻"
+        Title = "LAST DETECTION",
+        Content = "NEVER 🛡️"
     })
 
     Tabs.Main:AddButton({
         Title = "Click to Redirect to Our Discord! 🔗",
         Description = "Opens the Discord invite link in your browser.",
         Callback = function()
-            setclipboard("https://dsc.gg/soon")
+            setclipboard("https://dsc.gg/nexohub")
             -- In Roblox exploits, opening a browser is typically done via request/shell functions,
             -- however replacing it or giving them a clipboard copy is much safer for universal compatibility.
             -- Some exploits support `toclipboard` or `setclipboard` to copy the link.
             -- We'll try to provide a notification that it was copied.
             Fluent:Notify({
                 Title = "Discord Link Copied!",
-                Content = "The link 'https://dsc.gg/soon' has been copied to your clipboard. Paste it in your browser!",
+                Content = "The link 'https://dsc.gg/nexohub' has been copied to your clipboard. Paste it in your browser!",
                 Duration = 5
             })
         end
@@ -1547,8 +1547,14 @@ do
                                                 
                                                 if subjectVal ~= "" then
                                                     local lowerSub = string.lower(subjectVal)
-                                                    if lowerSub == "jester" or lowerSub == "shared" or lowerSub == "terminal" or lowerSub == "classic" or lowerSub == "crazy terminal" or lowerSub == "crazy-terminal" or lowerSub == "jackpot" then
-                                                        if lowerSub == "crazy-terminal" then battleMode = "CRAZY TERMINAL" else battleMode = string.upper(subjectVal) end
+                                                    if lowerSub == "jester" or lowerSub == "shared" or lowerSub == "terminal" or lowerSub == "classic" or lowerSub == "crazy terminal" or lowerSub == "crazy-terminal" or lowerSub == "jackpot" or lowerSub == "crazy jackpot" then
+                                                        if lowerSub == "crazy-terminal" then 
+                                                            battleMode = "CRAZY TERMINAL" 
+                                                        elseif lowerSub == "crazy jackpot" then
+                                                            battleMode = "CRAZY JACKPOT"
+                                                        else 
+                                                            battleMode = string.upper(subjectVal) 
+                                                        end
                                                         battleCase = "Military"
                                                     else
                                                         battleCase = subjectVal
@@ -2182,7 +2188,7 @@ do
 end
 
 Fluent:Notify({
-    Title = "Fluent",
+    Title = "NexoHub v1.0",
     Content = "The script has been loaded.",
     Duration = 8
 })
