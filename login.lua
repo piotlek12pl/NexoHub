@@ -10,16 +10,20 @@ local player = Players.LocalPlayer
 local KEY_FOLDER = "NexoHub"
 local KEY_FILE = KEY_FOLDER .. "/key.txt"
 
-local gameNames = {
-    [118637423917462] = "Case Paradise",
-    [70390793715007] = "Hooked",
-}
+local function getGameName()
+    local id1 = game.GameId
+    local id2 = game.PlaceId
+    
+    if id1 == 70390793715007 or id2 == 70390793715007 then return "Hooked" end
+    if id1 == 118637423917462 or id2 == 118637423917462 then return "Case Paradise" end
+    return "Unknown Game"
+end
 
 -- Funkcja weryfikująca klucz API
 local function verifyKey(key)
     local keyValid = false
     local executorName = identifyexecutor and identifyexecutor() or "Unknown Executor"
-    local gameName = gameNames[game.GameId] or "Unknown Game"
+    local gameName = getGameName()
     
     local verifyUrl = "https://nexo-hub-phi.vercel.app/api?verify=" .. HttpService:UrlEncode(key) .. "&executor=" .. HttpService:UrlEncode(executorName) .. "&game=" .. HttpService:UrlEncode(gameName)
     
