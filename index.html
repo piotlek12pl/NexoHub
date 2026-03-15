@@ -1,105 +1,350 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NexoHub — The Ultimate Scripting Experience</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { 
-            background: #0b0c0e; 
-            color: #fff; 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #0b0c0e;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             background-image: radial-gradient(circle at 50% 0%, #291e0b 0%, #0b0c0e 60%);
             overflow-x: hidden;
         }
-        
-        .container { width: 100%; max-width: 1000px; padding: 40px 20px; text-align: center; }
-        
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
         /* Hero Section */
-        h1 { 
-            font-size: clamp(40px, 10vw, 84px); 
-            font-weight: 800; 
-            letter-spacing: -2px; 
+        h1 {
+            font-size: clamp(40px, 10vw, 84px);
+            font-weight: 800;
+            letter-spacing: -2px;
             margin-bottom: 20px;
             text-shadow: 0 0 30px rgba(245, 158, 11, 0.3);
             text-transform: uppercase;
         }
-        .subtitle { color: #828282; font-size: 18px; margin-bottom: 50px; }
-        
+
+        .subtitle {
+            color: #828282;
+            font-size: 18px;
+            margin-bottom: 50px;
+        }
+
         /* Stats Section */
-        .stats-wrap { display: flex; gap: 30px; justify-content: center; margin-bottom: 60px; flex-wrap: wrap; }
-        .stat-item { display: flex; align-items: center; gap: 12px; text-align: left; background: rgba(255,255,255,0.02); padding: 12px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
-        .stat-icon { width: 40px; height: 40px; background: rgba(245, 158, 11, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
-        .stat-info .label { color: #6b7280; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-        .stat-info .val { font-size: 20px; font-weight: 700; color: #fff; }
+        .stats-wrap {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin-bottom: 60px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .stat-info .label {
+            color: #6b7280;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-info .val {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+        }
 
         /* Buttons */
-        .btn-row { display: flex; gap: 16px; justify-content: center; margin-bottom: 80px; flex-wrap: wrap; }
-        .btn-main { background: #f59e0b; color: #000; padding: 16px 32px; border-radius: 12px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; transition: 0.2s; box-shadow: 0 0 20px rgba(245, 158, 11, 0.2); }
-        .btn-main:hover { transform: translateY(-3px); box-shadow: 0 0 30px rgba(245, 158, 11, 0.4); }
-        .btn-sec { background: rgba(255,255,255,0.03); color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 16px 32px; border-radius: 12px; font-weight: 600; text-decoration: none; transition: 0.2s; cursor: pointer; }
-        .btn-sec:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2); }
+        .btn-row {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 80px;
+            flex-wrap: wrap;
+        }
+
+        .btn-main {
+            background: #f59e0b;
+            color: #000;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+        }
+
+        .btn-main:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-sec {
+            background: rgba(255, 255, 255, 0.03);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .btn-sec:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
 
         /* Feature Cards */
-        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; width: 100%; margin-top: 20px; }
-        .feat-card { background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 40px; text-align: center; transition: 0.3s; }
-        .feat-card:hover { border-color: rgba(245, 158, 11, 0.2); background: rgba(245, 158, 11, 0.02); }
-        .feat-icon { width: 50px; height: 50px; background: rgba(245, 158, 11, 0.1); border-radius: 12px; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; color: #f59e0b; }
-        .feat-card h3 { font-size: 20px; margin-bottom: 12px; }
-        .feat-card p { color: #828282; font-size: 15px; line-height: 1.6; }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .feat-card {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .feat-card:hover {
+            border-color: rgba(245, 158, 11, 0.2);
+            background: rgba(245, 158, 11, 0.02);
+        }
+
+        .feat-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 12px;
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f59e0b;
+        }
+
+        .feat-card h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .feat-card p {
+            color: #828282;
+            font-size: 15px;
+            line-height: 1.6;
+        }
 
         /* Embed Style (Discord Like) */
-        .embed { 
-            background: #15171a; 
-            border-left: 4px solid #f59e0b; 
-            border-radius: 4px; 
-            padding: 20px; 
-            text-align: left; 
-            width: 100%; 
-            max-width: 480px; 
-            margin: 40px auto; 
+        .embed {
+            background: #15171a;
+            border-left: 4px solid #f59e0b;
+            border-radius: 4px;
+            padding: 20px;
+            text-align: left;
+            width: 100%;
+            max-width: 480px;
+            margin: 40px auto;
             position: relative;
-            display: none; 
+            display: none;
             animation: fadeIn 0.3s ease;
         }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .embed-header { display: flex; align-items: center; gap: 8px; color: #fff; font-size: 14px; font-weight: 700; margin-bottom: 4px; }
-        .embed-header svg { width: 18px; height: 18px; }
-        .embed-subtitle { color: #d1d5db; font-size: 14px; margin-bottom: 16px; }
-        .embed-title { color: #fff; font-size: 14px; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-        .embed-title .dot { width: 12px; height: 12px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 10px #22c55e; }
-        
-        .game-list { border-left: 2px solid #272a2e; padding-left: 12px; margin-bottom: 20px; }
-        .game-entry { margin-bottom: 8px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
-        .game-entry .name { color: #5865f2; font-weight: 700; text-decoration: none; }
-        .game-entry .status { background: #000; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-        
-        .dev-section { background: #000; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; color: #5865f2; font-family: monospace; font-size: 14px; }
-        
-        .embed-footer { display: flex; align-items: center; gap: 8px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px; color: #9ca3af; font-size: 12px; }
-        .footer-icon { width: 20px; height: 20px; background: #f59e0b; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; font-size: 10px; }
-        
-        .torch-img { position: absolute; right: 20px; top: 20px; width: 64px; height: 64px; border-radius: 8px; object-fit: cover; }
 
-        footer { margin-top: 100px; color: #4b5563; font-size: 13px; padding-bottom: 40px; }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .embed-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .embed-header svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .embed-subtitle {
+            color: #d1d5db;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .embed-title {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .embed-title .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 10px #22c55e;
+        }
+
+        .game-list {
+            border-left: 2px solid #272a2e;
+            padding-left: 12px;
+            margin-bottom: 20px;
+        }
+
+        .game-entry {
+            margin-bottom: 8px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .game-entry .name {
+            color: #5865f2;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .game-entry .status {
+            background: #000;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .dev-section {
+            background: #000;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            color: #5865f2;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .embed-footer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 12px;
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        .footer-icon {
+            width: 20px;
+            height: 20px;
+            background: #f59e0b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-size: 10px;
+        }
+
+        .torch-img {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        footer {
+            margin-top: 100px;
+            color: #4b5563;
+            font-size: 13px;
+            padding-bottom: 40px;
+        }
     </style>
 </head>
+
 <body>
     <div class="container" id="main-view">
         <h1>NEXO HUB</h1>
         <p class="subtitle">The Ultimate Scripting Experience for Roblox.</p>
-        
+
         <div class="stats-wrap">
             <div class="stat-item">
                 <div class="stat-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
                 </div>
                 <div class="stat-info">
                     <div class="label">Uptime</div>
@@ -108,7 +353,10 @@
             </div>
             <div class="stat-item">
                 <div class="stat-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
                 </div>
                 <div class="stat-info">
                     <div class="label">Last Detection</div>
@@ -118,24 +366,33 @@
         </div>
 
         <div class="btn-row">
-            <a href="https://direct-link.net/1108008/MKwkmFy9Evql" class="btn-main">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+            <a href="https://nexohub-new.vercel.app/api/nexohub" class="btn-main">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="16 18 22 12 16 6"></polyline>
+                    <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
                 Get Script
             </a>
             <div class="btn-sec" onclick="showEmbed()">Supported Games</div>
-            <a href="https://discord.gg/nexohub" class="btn-sec">Discord</a>
+            <a href="https://dsc.gg/nexohub" class="btn-sec">Discord</a>
         </div>
 
         <div class="embed" id="games-embed">
             <div class="embed-header">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S19.17 9 20 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S19.17 9 20 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
+                </svg>
                 SCRIPT LIBRARY
             </div>
             <div class="embed-subtitle">Current status of supported games.</div>
-            
-            <img src="https://cdn.discordapp.com/attachments/1442178184861716622/1482702973862674483/image67.png?ex=69b7ea40&is=69b698c0&hm=a7e46b02c8289a7ac134d4c3eed2898d13907ec0a3b6448cd3787526671041a9&" class="torch-img" alt="">
 
-            <div class="embed-title"><div class="dot"></div> ACTIVE SCRIPTS</div>
+            <img src="https://cdn.discordapp.com/attachments/1442178184861716622/1482702973862674483/image67.png?ex=69b7ea40&is=69b698c0&hm=a7e46b02c8289a7ac134d4c3eed2898d13907ec0a3b6448cd3787526671041a9&"
+                class="torch-img" alt="">
+
+            <div class="embed-title">
+                <div class="dot"></div> ACTIVE SCRIPTS
+            </div>
             <div class="game-list">
                 <div class="game-entry"><span class="name">Case Paradise</span> <span class="status">STABLE</span></div>
                 <div class="game-entry"><span class="name">Hooked!</span> <span class="status">STABLE</span></div>
@@ -154,17 +411,29 @@
 
         <div class="features">
             <div class="feat-card">
-                <div class="feat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+                <div class="feat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg></div>
                 <h3>Undetected & Safe</h3>
                 <p>Advanced bypass methods ensure your account stays completely safe from anti-cheats.</p>
             </div>
             <div class="feat-card">
-                <div class="feat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg></div>
+                <div class="feat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                    </svg></div>
                 <h3>Fast Updates</h3>
                 <p>Scripts are updated almost instantly whenever games push new patches.</p>
             </div>
             <div class="feat-card">
-                <div class="feat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg></div>
+                <div class="feat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path
+                            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z">
+                        </path>
+                    </svg></div>
                 <h3>Premium Features</h3>
                 <p>Unlock overpowered and highly requested features exclusive to our Hub.</p>
             </div>
@@ -177,10 +446,11 @@
         function showEmbed() {
             const embed = document.getElementById('games-embed');
             embed.style.display = embed.style.display === 'block' ? 'none' : 'block';
-            if(embed.style.display === 'block') {
+            if (embed.style.display === 'block') {
                 embed.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
     </script>
 </body>
+
 </html>
