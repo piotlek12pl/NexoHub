@@ -94,7 +94,7 @@ function getLandingHTML() {
             font-weight: 800;
             letter-spacing: -1px;
             margin-bottom: 4px;
-            background: linear-gradient(135deg, #ff4757, #ff6b81, #ff4757);
+            background: linear-gradient(135deg, #f59e0b, #fbbf24, #f59e0b);
             background-size: 200% 200%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -239,7 +239,7 @@ function getLandingHTML() {
         <div class="code-block" onclick="copyScript()">
             <div class="code-label">Loadstring</div>
             <div class="code-text">
-                <span class="fn">loadstring</span><span class="paren">(</span><span class="fn">game</span>:HttpGet<span class="paren">(</span><span class="str">"https://nexo-hub-phi.vercel.app/api/nexohub"</span><span class="paren">)</span><span class="paren">)</span><span class="paren">(</span><span class="paren">)</span>
+                <span class="fn">loadstring</span><span class="paren">(</span><span class="fn">game</span>:HttpGet<span class="paren">(</span><span class="str">"https://nexohub-new.vercel.app/api/nexohub"</span><span class="paren">)</span><span class="paren">)</span><span class="paren">(</span><span class="paren">)</span>
             </div>
         </div>
         <p class="copy-toast" id="toast">Click to copy</p>
@@ -257,7 +257,7 @@ function getLandingHTML() {
 
     <script>
         function copyScript() {
-            const cmd = 'loadstring(game:HttpGet("https://nexo-hub-phi.vercel.app/api/nexohub"))()';
+            const cmd = 'loadstring(game:HttpGet("https://nexohub-new.vercel.app/api/nexohub"))()';
             navigator.clipboard.writeText(cmd);
             const toast = document.getElementById('toast');
             toast.textContent = '✓ Copied to clipboard!';
