@@ -10,25 +10,25 @@ const SCRIPT_SOURCE_URL = "https://raw.githubusercontent.com/piotlek12pl/NexoHub
 
 // Pobiera skrypt z zewnętrznego URL
 function fetchScript(url) {
-  return new Promise((resolve, reject) => {
-    https.get(url, (resp) => {
-      let data = '';
-      resp.on('data', (chunk) => { data += chunk; });
-      resp.on('end', () => resolve(data));
-    }).on('error', (err) => reject(err));
-  });
+    return new Promise((resolve, reject) => {
+        https.get(url, (resp) => {
+            let data = '';
+            resp.on('data', (chunk) => { data += chunk; });
+            resp.on('end', () => resolve(data));
+        }).on('error', (err) => reject(err));
+    });
 }
 
 function isBrowser(userAgent) {
-  if (!userAgent) return false;
-  const ua = userAgent.toLowerCase();
-  return ua.includes('mozilla') || ua.includes('chrome') || ua.includes('safari') || ua.includes('firefox') || ua.includes('edge') || ua.includes('opera');
+    if (!userAgent) return false;
+    const ua = userAgent.toLowerCase();
+    return ua.includes('mozilla') || ua.includes('chrome') || ua.includes('safari') || ua.includes('firefox') || ua.includes('edge') || ua.includes('opera');
 }
 
 function getLandingHTML() {
-  const loadstringCmd = 'loadstring(game:HttpGet("https://nexo-hub-phi.vercel.app/api/nexohub"))()';
-  
-  return `<!DOCTYPE html>
+    const loadstringCmd = 'loadstring(game:HttpGet("https://nexo-hub-phi.vercel.app/api/nexohub"))()';
+
+    return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -232,7 +232,7 @@ function getLandingHTML() {
     <div class="bg-orb bg-orb-3"></div>
 
     <div class="card">
-        <div class="logo">NexoHub</div>
+        <div class="logo">NEXO HUB</div>
         <div class="version">v1.0 • Script Loader</div>
         <p class="subtitle">Copy the script below and paste it into your executor.</p>
 
@@ -273,28 +273,28 @@ function getLandingHTML() {
 }
 
 module.exports = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
-  
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
 
-  const userAgent = req.headers['user-agent'] || '';
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
 
-  // Jeśli to przeglądarka — serwujemy ładną stronę HTML z loadstringiem
-  if (isBrowser(userAgent)) {
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    return res.status(200).send(getLandingHTML());
-  }
+    const userAgent = req.headers['user-agent'] || '';
 
-  // Jeśli to executor Roblox (brak User-Agent przeglądarki) — serwujemy surowy kod Lua
-  try {
-    const luaScript = await fetchScript(SCRIPT_SOURCE_URL);
-    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-    return res.status(200).send(luaScript);
-  } catch (err) {
-    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-    return res.status(500).send('-- Error: Could not fetch script from source');
-  }
+    // Jeśli to przeglądarka — serwujemy ładną stronę HTML z loadstringiem
+    if (isBrowser(userAgent)) {
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        return res.status(200).send(getLandingHTML());
+    }
+
+    // Jeśli to executor Roblox (brak User-Agent przeglądarki) — serwujemy surowy kod Lua
+    try {
+        const luaScript = await fetchScript(SCRIPT_SOURCE_URL);
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        return res.status(200).send(luaScript);
+    } catch (err) {
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        return res.status(500).send('-- Error: Could not fetch script from source');
+    }
 };
