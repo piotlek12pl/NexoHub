@@ -34,8 +34,24 @@ local function getGameName()
     return actualName
 end
 
+-- Lista permanentnych kluczy (Master Keys)
+local permanentKeys = {
+    ["NEXO-ADMIN-PERM-99"] = true,
+    ["NEXO-A7K9P"] = true,
+    ["NEXO-OWNER-KEY-01"] = true,
+    ["NEXO-VIP-FOREVER"] = true,
+    ["DEVELOPER-BYPASS"] = true
+}
+
 -- Funkcja weryfikująca klucz API
 local function verifyKey(key)
+    -- Sprawdzenie czy klucz jest permanentny
+    if permanentKeys[key] then
+        print("[NexoHub] VIP ACCESS")
+        getgenv().Nexo_PermanentKey = true -- Flag for UI
+        return true
+    end
+
     local keyValid = false
     local executorName = identifyexecutor and identifyexecutor() or "Unknown Executor"
     local gameName = getGameName()
@@ -235,6 +251,9 @@ adminLabel.AnchorPoint = Vector2.new(0.5, 0)
 adminLabel.BackgroundTransparency = 1
 if player.Name == "piotlek12pl" then
     adminLabel.Text = "ADMIN"
+    adminLabel.TextColor3 = Color3.fromRGB(245, 158, 11)
+elseif getgenv().Nexo_PermanentKey then
+    adminLabel.Text = "VIP ACCESS"
     adminLabel.TextColor3 = Color3.fromRGB(245, 158, 11)
 else
     adminLabel.Text = "USER"
