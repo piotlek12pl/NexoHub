@@ -922,7 +922,9 @@ do
                                                     ["Name"] = itemName,
                                                     ["Wear"] = wear,
                                                     ["Stattrak"] = isStatTrak,
-                                                    ["Age"] = item:GetAttribute("Age") or (item:FindFirstChild("Age") and item.Age.Value) or 0
+                                                    ["Age"] = item:GetAttribute("Age") or (item:FindFirstChild("Age") and item.Age.Value) or 0,
+                                                    ["UUID"] = item:GetAttribute("UUID"),
+                                                    ["Price"] = priceVal
                                                 }
                                             }
                                             
@@ -1386,7 +1388,9 @@ do
                                                             ["Name"] = itemName,
                                                             ["Wear"] = itemWear,
                                                             ["Stattrak"] = itemST,
-                                                            ["Age"] = age
+                                                            ["Age"] = age,
+                                                            ["UUID"] = drop.UUID,
+                                                            ["Price"] = itemValue
                                                         })
                                                         profitStats.earned = profitStats.earned + price
                                                         profitStats.profit = profitStats.profit + price
