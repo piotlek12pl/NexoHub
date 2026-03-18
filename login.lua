@@ -30,6 +30,9 @@ local function getGameName()
     if gid == "118637423917462" or pid == "118637423917462" or actualName:find("Case Paradise") then 
         return "Case Paradise" 
     end
+    if gid == "8737602449" or pid == "8737602449" or actualName:find("PLS DONATE") then 
+        return "PLS DONATE" 
+    end
     
     return actualName
 end
@@ -72,6 +75,7 @@ end
 local supportedGameIds = {
     [118637423917462] = "https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/caseparadise.lua",
     [70390793715007] = "https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/hooked.lua",
+    [8737602449] = "https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/plsdonate.lua",
 }
 
 -- ==========================================
