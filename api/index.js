@@ -9,6 +9,8 @@ const STAGE_2_LINK = "https://link-center.net/1108008/RVJqaSOOpHPX"; // Link do 
 // Szybka pamięć podręczna Vercela ratująca przed tworzeniem bazy danych
 // (działa ok. 15-30 minut w zależności od obciążenia Vercela)
 const recentActivity = new Map();
+// Server-side stage tracking (cookies fail due to cross-site blocking)
+const stageProgress = new Map();
 
 // Funkcje pomocnicze
 function getDailyKey(ipAddress = "") {
@@ -289,7 +291,7 @@ function getErrorHTML(message) {
         <div class="icon-wrap"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
         <h1>Action Denied</h1>
         <p class="message">${message}</p>
-        <a href="https://discord.gg/nexohub" class="btn-dark">Support Server</a>
+        <a href="https://dsc.gg/nexohub" class="btn-dark">Support Server</a>
     </div>
 </body>
 </html>`;
@@ -331,33 +333,15 @@ module.exports = async (req, res) => {
   const referer = (req.headers.referer || req.headers.referrer || '').toLowerCase();
   const isFromLinkvertise = referer.includes('linkvertise.com') || referer.includes('link-to.net') || referer.includes('link-center.net') || referer.includes('link-target.net') || referer.includes('direct-link.net');
 
-  // Odczyt ciasteczek do systemu postępu i resetu
-  const cookies = parseCookies(req.headers.cookie);
-  const hasStage1Token = cookies['nexohub_stage_1'] === 'passed';
-  const hasUsedReset = cookies['nexohub_reset_used'] === 'true';
+  // Server-side stage tracking by IP (replaces unreliable cookies)
+  const hasStage1Done = stageProgress.has(clientIp);
 
   // === OBSŁUGA '/api?reset=true' ===
   if (req.query.reset === 'true') {
-    if (hasUsedReset) {
-      return res.status(403).send(getErrorHTML("You have already reset your HWID today. Please wait until tomorrow."));
-    }
+    // Usuwamy postęp stage'a
+    stageProgress.delete(clientIp);
 
-    // Udzielono resetu: 
-    // - Wyczyszczono etap 1 (zmuszamy do zrobienia Linkvertise od nowa dla nowego IP)
-    // - Ustawiono blokadę resetu na 24 godziny
-    const resetCookieOptions = [
-      'HttpOnly', 'Secure', 'SameSite=Lax', 'Path=/', `Max-Age=${24 * 60 * 60}`
-    ];
-    const clearStageOptions = [
-      'HttpOnly', 'Secure', 'SameSite=Lax', 'Path=/', 'Max-Age=0'
-    ];
-
-    res.setHeader('Set-Cookie', [
-      `nexohub_reset_used=true; ${resetCookieOptions.join('; ')}`,
-      `nexohub_stage_1=; ${clearStageOptions.join('; ')}`
-    ]);
-
-    // Przenosimy użykownika od razu do 1 etapu z powiadomieniem
+    // Przenosimy użytkownika od razu do 1 etapu z powiadomieniem
     return res.status(200).send(`
       <script>
         alert('Hardware ID has been reset! You must now generate a new key on your new IP.');
@@ -373,17 +357,15 @@ module.exports = async (req, res) => {
   }
 
   // WERYFIKACJA ETAPÓW LINKVERTISE
-  if (!hasStage1Token) {
-    // ETAP 1 ZALICZONY -> Nakaz zrobienia Etapu 2
-    const options = [
-      'HttpOnly', 'Secure', 'SameSite=Lax', 'Path=/', `Max-Age=${60 * 60}`
-    ];
-    res.setHeader('Set-Cookie', `nexohub_stage_1=passed; ${options.join('; ')}`);
+  if (!hasStage1Done) {
+    // ETAP 1 ZALICZONY -> Zapisujemy server-side, nakaz zrobienia Etapu 2
+    stageProgress.set(clientIp, { stage: 1, time: Date.now() });
     return res.status(200).send(getStage1CompleteHTML());
   }
   else {
-    // ETAP 2 ZALICZONY -> Sukces, dajemy klucz. Pamiętamy zablokowanie powrotu do Etapu 2 po klucz za darmo po paru minutach.
-    res.setHeader('Set-Cookie', 'nexohub_stage_1=; Max-Age=0; Path=/; HttpOnly; Secure');
+    // ETAP 2 ZALICZONY -> Sukces, dajemy klucz. Czyścimy postęp żeby nie dało się wejść ponownie bez Linkvertise.
+    stageProgress.delete(clientIp);
     return res.status(200).send(getSuccessHTML(currentKey, clientIp));
   }
 };
+
