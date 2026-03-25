@@ -41,6 +41,7 @@ end
 local permanentKeys = {
     ["NEXO-ADMIN-PERM-99"] = true,
     ["NEXO-A7K9P"] = true,
+    ["NEXO-9XB2M"] = true,
     ["NEXO-OWNER-KEY-01"] = true,
     ["NEXO-VIP-FOREVER"] = true,
     ["DEVELOPER-BYPASS"] = true
