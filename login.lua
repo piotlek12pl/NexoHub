@@ -30,6 +30,9 @@ local function getGameName()
     if gid == "118637423917462" or pid == "118637423917462" or actualName:find("Case Paradise") then 
         return "Case Paradise" 
     end
+    if gid == "84259959693333" or pid == "84259959693333" or actualName:find("Skateboard for Brainrots") then 
+        return "Skateboard for Brainrots" 
+    end
     if gid == "8737602449" or pid == "8737602449" or actualName:find("PLS DONATE") then 
         return "PLS DONATE" 
     end
