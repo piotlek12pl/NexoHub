@@ -79,7 +79,8 @@ end
 local supportedGameIds = {
     [118637423917462] = "https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/caseparadise.lua",
     [70390793715007] = "https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/hooked.lua",
-    [8737602449] = "https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/plsdonate.lua",
+    [70390793715007] = "https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/hooked.lua",
+    [84259959693333] = "https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/plsdonate.lua",
 }
 
 -- ==========================================
