@@ -50,12 +50,36 @@ local permanentKeys = {
     ["DEVELOPER-BYPASS"] = true
 }
 
+-- ===== XOR DECRYPTION (odpowiada XOR w nexohub.js) =====
+-- Zamienia hex string -> bytes -> XOR z kluczem -> string
+local function xorDecryptHex(hexStr, key)
+    local result = {}
+    local keyBytes = {}
+    for i = 1, #key do
+        keyBytes[#keyBytes + 1] = string.byte(key, i)
+    end
+    local keyLen = #keyBytes
+    local byteIdx = 0
+    for i = 1, #hexStr - 1, 2 do
+        local byte = tonumber(hexStr:sub(i, i+1), 16)
+        local keyByte = keyBytes[(byteIdx % keyLen) + 1]
+        result[#result + 1] = string.char(byte ~ keyByte)
+        byteIdx = byteIdx + 1
+    end
+    return table.concat(result)
+end
+
+-- Globalny token sesji (po weryfikacji klucza)
+local sessionToken = nil
+
 -- Funkcja weryfikująca klucz API
 local function verifyKey(key)
     -- Sprawdzenie czy klucz jest permanentny
     if permanentKeys[key] then
         print("[NexoHub] VIP ACCESS")
         getgenv().Nexo_PermanentKey = true -- Flag for UI
+        -- Dla kluczy permanentnych tworzymy lokalny pseudo-token
+        sessionToken = "PERM_" .. tostring(tick()) .. "_" .. tostring(math.random(100000, 999999))
         return true
     end
 
@@ -70,6 +94,10 @@ local function verifyKey(key)
         local data = HttpService:JSONDecode(response)
         if data and data.valid == true then
             keyValid = true
+            -- Odbieramy jednorazowy session token
+            if data.token then
+                sessionToken = data.token
+            end
         end
     end)
     return keyValid
@@ -539,10 +567,55 @@ local function startInjectionSequence()
     blur:Destroy()
     gui:Destroy()
     
-    -- Wykonanie loadstringa przypisanego do danej gry
     if gameUrl then
         getgenv().Nexo_Authorized = "NexoHub_Session_Success"
-        loadstring(game:HttpGet(gameUrl))()
+        
+        -- Jeśli mamy session token używamy zabezpieczonego endpointu z szyfrowaniem
+        if sessionToken then
+            local secureUrl = "https://nexohub-new.vercel.app/api/nexohub?token=" .. HttpService:UrlEncode(sessionToken)
+            
+            local ok, encResponse = pcall(function()
+                return game:HttpGet(secureUrl)
+            end)
+            
+            if ok and encResponse and encResponse:sub(1, 12) == "NEXO_ENC_V1|" then
+                -- Parsujemy format: "NEXO_ENC_V1|TOKEN|HEX_DATA"
+                local parts = {}
+                for part in encResponse:gmatch("([^|]+)") do
+                    parts[#parts + 1] = part
+                end
+                
+                if #parts >= 3 then
+                    local echoToken = parts[2]
+                    local hexData   = parts[3]
+                    
+                    -- Deszyfrujemy XOR używając tokenu jako klucza
+                    local decryptedScript = xorDecryptHex(hexData, echoToken)
+                    
+                    if #decryptedScript > 100 then
+                        -- Skrypt wygląda poprawnie - wykonujemy
+                        local fn, err = loadstring(decryptedScript)
+                        if fn then
+                            fn()
+                        else
+                            warn("[NexoHub] Script parse error: " .. tostring(err))
+                        end
+                    else
+                        warn("[NexoHub] Decryption produced invalid script, falling back.")
+                        loadstring(game:HttpGet(gameUrl))()
+                    end
+                else
+                    warn("[NexoHub] Invalid response format, falling back.")
+                    loadstring(game:HttpGet(gameUrl))()
+                end
+            else
+                -- Fallback (stary system) jeśli odpowiedź nie jest zaszyfrowana
+                loadstring(game:HttpGet(gameUrl))()
+            end
+        else
+            -- Brak tokenu (nie powinno się zdarzyć przy aktywnych kluczach)
+            loadstring(game:HttpGet(gameUrl))()
+        end
     end
 end
 
