@@ -11,6 +11,26 @@ const STAGE_2_LINK = "https://link-center.net/1108008/RVJqaSOOpHPX"; // Link do 
 const recentActivity = new Map();
 // Server-side stage tracking (cookies fail due to cross-site blocking)
 const stageProgress = new Map();
+// Session tokens: token -> { ip, expiresAt }
+// Token jest jednorazowy i wygasa po 90 sekundach
+const sessionTokens = new Map();
+
+// Generuje kryptograficznie losowy UUID v4
+function generateToken() {
+  const bytes = Array.from({ length: 16 }, () => Math.floor(Math.random() * 256));
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = bytes.map(b => b.toString(16).padStart(2, '0'));
+  return `${hex.slice(0,4).join('')}-${hex.slice(4,6).join('')}-${hex.slice(6,8).join('')}-${hex.slice(8,10).join('')}-${hex.slice(10).join('')}`;
+}
+
+// Czyści wygasłe tokeny (zapobiega memory leak)
+function purgeExpiredTokens() {
+  const now = Date.now();
+  for (const [token, data] of sessionTokens.entries()) {
+    if (now > data.expiresAt) sessionTokens.delete(token);
+  }
+}
 
 // Funkcje pomocnicze
 function getDailyKey(ipAddress = "") {
@@ -315,15 +335,38 @@ module.exports = async (req, res) => {
   if (req.query.verify) {
     if (req.query.verify === currentKey) {
 
-      // Zapisujemy prawdziwość wykonywania bezpośrednio z hookowanego klienta
+      // Zapisujemy aktywność
       const exec = req.query.executor || "Unknown";
       const game = req.query.game || "Unknown";
       recentActivity.set(clientIp, { executor: exec, game: game });
 
-      return res.status(200).json({ valid: true });
+      // Generujemy jednorazowy session token (ważny 90 sekund)
+      purgeExpiredTokens();
+      const token = generateToken();
+      sessionTokens.set(token, {
+        ip: clientIp,
+        expiresAt: Date.now() + 90_000, // 90 sekund
+        used: false
+      });
+
+      return res.status(200).json({ valid: true, token: token });
     } else {
       return res.status(403).json({ valid: false });
     }
+  }
+
+  // === TRYB 1b: Weryfikacja tokenu przez nexohub.js (wewnętrzna) ===
+  // Endpoint: /api?check_token=TOKEN
+  // Zwraca JSON: { valid: bool }
+  if (req.query.check_token) {
+    const tokenData = sessionTokens.get(req.query.check_token);
+    purgeExpiredTokens();
+    if (tokenData && !tokenData.used && Date.now() < tokenData.expiresAt) {
+      tokenData.used = true; // Token jednorazowy
+      sessionTokens.set(req.query.check_token, tokenData);
+      return res.status(200).json({ valid: true });
+    }
+    return res.status(403).json({ valid: false });
   }
 
   // === TRYB 2: Generowanie klucza w Przeglądarce ===
