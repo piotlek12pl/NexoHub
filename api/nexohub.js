@@ -9,8 +9,17 @@
 
 const https = require('https');
 
-// URL źródłowy skryptu login.lua (GitHub raw)
-const SCRIPT_SOURCE_URL = "https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/login.lua";
+// URL źródłowy skryptu login.lua (zwracany gdy brak tokenu - publiczny entry point)
+const LOGIN_SCRIPT_URL = "https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/login.lua";
+
+// Mapowanie PlaceId -> URL skryptu gry (SERWER-SIDE, niewidoczne dla użytkowników)
+// Te URLe są ukryte i wymagają ważnego tokenu aby je otrzymać
+const GAME_SCRIPTS = {
+    '70390793715007':   'https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/hooked.lua',
+    '118637423917462':  'https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/caseparadise.lua',
+    '8737602449':       'https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/plsdonate.lua',
+    '84259959693333':   'https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/skateboardforbrainrots.lua',
+};
 
 // Wewnętrzny URL do weryfikacji tokenu (ten sam Vercel deployment)
 // Używamy zmiennej środowiskowej aby nie hardcodować domeny
@@ -202,10 +211,14 @@ module.exports = async (req, res) => {
         // Zwracamy skrypt login.lua - to jest bezpieczne, bo sama logika auth jest tam zawarta
         // To jest entry point - zawsze można pobrać login.lua (on jest "public")
         try {
-            const loginScript = await fetchText(SCRIPT_SOURCE_URL);
-            return res.status(200).send(loginScript.body);
+            const loginScript = await fetchText(LOGIN_SCRIPT_URL);
+            if (loginScript.status === 200) {
+                return res.status(200).send(loginScript.body);
+            } else {
+                return res.status(500).send('-- [NexoHub] Error: Could not load entry script.');
+            }
         } catch (e) {
-            return res.status(500).send('-- Error loading login module');
+            return res.status(500).send('-- [NexoHub] Error loading entry module');
         }
     }
 
@@ -227,24 +240,25 @@ module.exports = async (req, res) => {
             return res.status(403).send('-- [NexoHub] Error: Invalid or expired session token. Please re-authenticate.');
         }
 
-        // Token OK → pobieramy rzeczywisty skrypt gry (guiexample.lua lub inny)
-        // UWAGA: To NIE jest login.lua - to główny payload
-        // URL do rzeczywistego skryptu (ten sam co wcześniej w nexohub.js, ale teraz chroniony)
-        const mainScriptUrl = "https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/login.lua";
-        const scriptResult = await fetchText(mainScriptUrl);
+        // Token OK → określamy który skrypt gry ma być zwrócony
+        const gameId = req.query.game || '';
+        const gameScriptUrl = GAME_SCRIPTS[gameId];
+
+        if (!gameScriptUrl) {
+            res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+            return res.status(404).send('-- [NexoHub] Error: Game not supported or unknown PlaceId.');
+        }
+ 
+        // Pobieramy właściwy skrypt gry
+        const scriptResult = await fetchText(gameScriptUrl);
 
         if (scriptResult.status !== 200) {
             res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-            return res.status(500).send('-- [NexoHub] Error: Could not fetch script payload.');
+            return res.status(500).send('-- [NexoHub] Error: Could not fetch game script payload.');
         }
 
-        // XOR-szyfrujemy skrypt tokenem
-        // Dzięki temu nawet przechwycony request jest bezużyteczny bez znajomości tokenu
+        // XOR-szyfrujemy skrypt — bez ważnego tokenu dane są bezużyteczne
         const encrypted = xorEncrypt(scriptResult.body, token);
-
-        // Odsyłamy zaszyfrowany hex + token echo (do deszyfrowania po stronie Lua)
-        // Format: "TOKEN_ECHO|HEX_DATA"
-        // Token echo pozwala login.lua zweryfikować poprawność odpowiedzi bez dodatkowego requestu
         res.setHeader('Content-Type', 'text/plain; charset=utf-8');
         return res.status(200).send(`NEXO_ENC_V1|${token}|${encrypted}`);
 
