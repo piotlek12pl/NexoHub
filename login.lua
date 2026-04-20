@@ -52,6 +52,7 @@ local permanentKeys = {
 
 -- ===== XOR DECRYPTION (odpowiada XOR w nexohub.js) =====
 -- Zamienia hex string -> bytes -> XOR z kluczem -> string
+-- Używamy bit32.bxor() zamiast ~ (tylko Lua 5.3+, nie działa na wszystkich egzekutorach)
 local function xorDecryptHex(hexStr, key)
     local result = {}
     local keyBytes = {}
@@ -63,7 +64,7 @@ local function xorDecryptHex(hexStr, key)
     for i = 1, #hexStr - 1, 2 do
         local byte = tonumber(hexStr:sub(i, i+1), 16)
         local keyByte = keyBytes[(byteIdx % keyLen) + 1]
-        result[#result + 1] = string.char(byte ~ keyByte)
+        result[#result + 1] = string.char(bit32.bxor(byte, keyByte))
         byteIdx = byteIdx + 1
     end
     return table.concat(result)
@@ -570,9 +571,12 @@ local function startInjectionSequence()
     if gameUrl then
         getgenv().Nexo_Authorized = "NexoHub_Session_Success"
         
-        -- Jeśli mamy session token używamy zabezpieczonego endpointu z szyfrowaniem
+        -- Używamy zabezpieczonego endpointu z tokenem i ID gry
         if sessionToken then
-            local secureUrl = "https://nexohub-new.vercel.app/api/nexohub?token=" .. HttpService:UrlEncode(sessionToken)
+            local currentPlaceId = tostring(game.PlaceId)
+            local secureUrl = "https://nexohub-new.vercel.app/api/nexohub"
+                .. "?token=" .. HttpService:UrlEncode(sessionToken)
+                .. "&game=" .. currentPlaceId
             
             local ok, encResponse = pcall(function()
                 return game:HttpGet(secureUrl)
@@ -593,27 +597,28 @@ local function startInjectionSequence()
                     local decryptedScript = xorDecryptHex(hexData, echoToken)
                     
                     if #decryptedScript > 100 then
-                        -- Skrypt wygląda poprawnie - wykonujemy
-                        local fn, err = loadstring(decryptedScript)
+                        local fn, compileErr = loadstring(decryptedScript)
                         if fn then
                             fn()
                         else
-                            warn("[NexoHub] Script parse error: " .. tostring(err))
+                            -- Błąd kompilacji - fallback na bezpośredni URL
+                            warn("[NexoHub] Compile error: " .. tostring(compileErr) .. " — Trying fallback.")
+                            loadstring(game:HttpGet(gameUrl))()
                         end
                     else
-                        warn("[NexoHub] Decryption produced invalid script, falling back.")
+                        warn("[NexoHub] Decryption failed — Trying fallback.")
                         loadstring(game:HttpGet(gameUrl))()
                     end
                 else
-                    warn("[NexoHub] Invalid response format, falling back.")
+                    warn("[NexoHub] Bad response format — Trying fallback.")
                     loadstring(game:HttpGet(gameUrl))()
                 end
             else
-                -- Fallback (stary system) jeśli odpowiedź nie jest zaszyfrowana
+                -- Fallback bez szyfrowania (token odrzucony lub błąd serwera)
                 loadstring(game:HttpGet(gameUrl))()
             end
         else
-            -- Brak tokenu (nie powinno się zdarzyć przy aktywnych kluczach)
+            -- Brak tokenu - stary tryb bezpośredni
             loadstring(game:HttpGet(gameUrl))()
         end
     end
