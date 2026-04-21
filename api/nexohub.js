@@ -1,16 +1,14 @@
 // api/nexohub.js — Secured Script Endpoint with Token Auth + XOR Encryption
-// 
-// Flow:
-// 1. login.lua weryfikuje klucz -> dostaje { valid: true, token: "UUID" }
-// 2. login.lua woła: game:HttpGet("/api/nexohub?token=UUID")
-// 3. Ten endpoint sprawdza token w /api?check_token=UUID
-// 4. Jeśli OK -> pobiera skrypt, XOR-szyfruje tokenem, odsyła hex string
-// 5. login.lua deszyfruje XOR i wykonuje loadstring()
 
 const https = require('https');
+const crypto = require('crypto');
 
 // URL źródłowy skryptu login.lua (zwracany gdy brak tokenu - publiczny entry point)
 const LOGIN_SCRIPT_URL = "https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/login.lua";
+
+// ===== KONFIGURACJA =====
+const SECRET_SALT = process.env.SECRET_SALT || "NEXOHUB_SECRET_SALT_2026";
+// =========================
 
 // Mapowanie PlaceId -> URL skryptu gry (SERWER-SIDE, niewidoczne dla użytkowników)
 // Te URLe są ukryte i wymagają ważnego tokenu aby je otrzymać
@@ -20,12 +18,6 @@ const GAME_SCRIPTS = {
     '8737602449':       'https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/plsdonate.lua',
     '84259959693333':   'https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/skateboardforbrainrots.lua',
 };
-
-// Wewnętrzny URL do weryfikacji tokenu (ten sam Vercel deployment)
-// Używamy zmiennej środowiskowej aby nie hardcodować domeny
-const TOKEN_VERIFY_BASE = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}/api`
-    : "https://nexohub-new.vercel.app/api";
 
 // Pobiera tekst z URL
 function fetchText(url) {
@@ -222,15 +214,24 @@ module.exports = async (req, res) => {
         }
     }
 
-    // Weryfikacja tokenu przez wewnętrzny endpoint index.js
+    // Weryfikacja tokenu "w miejscu", bezstanowo za pomoca kryptografii
     try {
-        const verifyUrl = `${TOKEN_VERIFY_BASE}?check_token=${encodeURIComponent(token)}`;
-        const verifyResult = await fetchText(verifyUrl);
-
         let tokenValid = false;
         try {
-            const parsed = JSON.parse(verifyResult.body);
-            tokenValid = parsed.valid === true;
+            const decoded = Buffer.from(token, 'base64').toString('utf8');
+            const parts = decoded.split('|');
+            if (parts.length === 3) {
+                const expiresAt = parseInt(parts[0], 10);
+                const nonce = parts[1];
+                const sig = parts[2];
+
+                if (Date.now() <= expiresAt) {
+                    const expectedSig = crypto.createHmac('sha256', SECRET_SALT).update(`${parts[0]}|${nonce}`).digest('hex').substring(0, 16);
+                    if (sig === expectedSig) {
+                        tokenValid = true;
+                    }
+                }
+            }
         } catch (_) {
             tokenValid = false;
         }
@@ -248,7 +249,7 @@ module.exports = async (req, res) => {
             res.setHeader('Content-Type', 'text/plain; charset=utf-8');
             return res.status(404).send('-- [NexoHub] Error: Game not supported or unknown PlaceId.');
         }
- 
+
         // Pobieramy właściwy skrypt gry
         const scriptResult = await fetchText(gameScriptUrl);
 
