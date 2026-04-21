@@ -75,15 +75,6 @@ local sessionToken = nil
 
 -- Funkcja weryfikująca klucz API
 local function verifyKey(key)
-    -- Sprawdzenie czy klucz jest permanentny
-    if permanentKeys[key] then
-        print("[NexoHub] VIP ACCESS")
-        getgenv().Nexo_PermanentKey = true -- Flag for UI
-        -- Dla kluczy permanentnych tworzymy lokalny pseudo-token
-        sessionToken = "PERM_" .. tostring(tick()) .. "_" .. tostring(math.random(100000, 999999))
-        return true
-    end
-
     local keyValid = false
     local executorName = identifyexecutor and identifyexecutor() or "Unknown Executor"
     local gameName = getGameName()
@@ -95,21 +86,26 @@ local function verifyKey(key)
         local data = HttpService:JSONDecode(response)
         if data and data.valid == true then
             keyValid = true
-            -- Odbieramy jednorazowy session token
+            -- Odbieramy jednorazowy session token z backendu (nawet dla kluczy VIP)
             if data.token then
                 sessionToken = data.token
+            end
+            
+            -- Jeżeli backend zaakceptował (np. VIP keys to my traktujemy to jako permanent w UI)
+            if key:match("NEXO%-ADMIN") or key:match("VIP") or key:match("OWNER") then
+                getgenv().Nexo_PermanentKey = true
             end
         end
     end)
     return keyValid
 end
 
--- Lista wspieranych gier (Game ID -> loadstring URL)
+-- Lista wspieranych gier (tylko weryfikacja Game ID, prawdziwe URLe są ukryte na serwerze!)
 local supportedGameIds = {
-    [118637423917462] = "https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/caseparadise.lua",
-    [70390793715007] = "https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/hooked.lua",
-    [8737602449] = "https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/plsdonate.lua",
-    [84259959693333] = "https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/skateboardforbrainrots.lua",
+    [118637423917462] = true,
+    [70390793715007] = true,
+    [8737602449] = true,
+    [84259959693333] = true,
 }
 
 -- ==========================================
@@ -557,7 +553,7 @@ local function startInjectionSequence()
     displayStatus("Injecting Modules", 0.6)
     
     -- Zamykanie GUI przed skryptem gry
-    local gameUrl = supportedGameIds[currentGameId]
+    local isGameSupported = supportedGameIds[currentGameId]
     TweenService:Create(blur, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.In), { Size = 0 }):Play()
     local closeTween = TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
         GroupTransparency = 1,
@@ -568,7 +564,7 @@ local function startInjectionSequence()
     blur:Destroy()
     gui:Destroy()
     
-    if gameUrl then
+    if isGameSupported then
         getgenv().Nexo_Authorized = "NexoHub_Session_Success"
         
         -- Używamy zabezpieczonego endpointu z tokenem i ID gry
@@ -601,25 +597,20 @@ local function startInjectionSequence()
                         if fn then
                             fn()
                         else
-                            -- Błąd kompilacji - fallback na bezpośredni URL
-                            warn("[NexoHub] Compile error: " .. tostring(compileErr) .. " — Trying fallback.")
-                            loadstring(game:HttpGet(gameUrl))()
+                            warn("[NexoHub] Compile error: " .. tostring(compileErr))
                         end
                     else
-                        warn("[NexoHub] Decryption failed — Trying fallback.")
-                        loadstring(game:HttpGet(gameUrl))()
+                        warn("[NexoHub] Decryption failed or payload empty.")
                     end
                 else
-                    warn("[NexoHub] Bad response format — Trying fallback.")
-                    loadstring(game:HttpGet(gameUrl))()
+                    warn("[NexoHub] Bad response format from server.")
                 end
             else
-                -- Fallback bez szyfrowania (token odrzucony lub błąd serwera)
-                loadstring(game:HttpGet(gameUrl))()
+                warn("[NexoHub] Backend server rejected request. (Token expired or unauthorized)")
             end
         else
-            -- Brak tokenu - stary tryb bezpośredni
-            loadstring(game:HttpGet(gameUrl))()
+            -- Rozłączono z serwerem, brak tokenu sesji - nie ma bezpośrednich fallbacków!
+            warn("[NexoHub] No active session token found!")
         end
     end
 end
