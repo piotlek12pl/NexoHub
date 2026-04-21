@@ -332,8 +332,20 @@ module.exports = async (req, res) => {
   const currentKey = getDailyKey(clientIp);
 
   // === TRYB 1: Weryfikacja klucza w Roblox ===
+  const PERMANENT_KEYS = [
+    "NEXO-ADMIN-PERM-99",
+    "NEXO-A7K9P", 
+    "NEXO-9XB2M",
+    "NEXO-OWNER-KEY-01",
+    "NEXO-VIP-FOREVER",
+    "DEVELOPER-BYPASS"
+  ];
+
   if (req.query.verify) {
-    if (req.query.verify === currentKey) {
+    const isDailyKey = req.query.verify === currentKey;
+    const isPermKey = PERMANENT_KEYS.includes(req.query.verify);
+
+    if (isDailyKey || isPermKey) {
 
       // Zapisujemy aktywność
       const exec = req.query.executor || "Unknown";
