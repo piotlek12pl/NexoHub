@@ -4559,7 +4559,7 @@ function library:Load(options)
         keybindlist = true,
         font = worldtoscreen ~= nil and "system" or "plex",
         fontsize = 13,
-        discord = "PAx5pxbKwY",
+        discord = "https://discord.gg/PAx5pxbKwY",
         sizex = 700,
         sizey = 550
     })
