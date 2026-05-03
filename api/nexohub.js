@@ -16,7 +16,7 @@ const GAME_SCRIPTS = {
     '70390793715007':   'https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/hooked.lua',
     '118637423917462':  'https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/caseparadise.lua',
     '8737602449':       'https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/plsdonate.lua',
-    '84259959693333':   'https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/skateboardforbrainrots.lua',
+    '84259959693333':   'https://raw.githubusercontent.com/piotlek12pl/NexoHub/refs/heads/main/games/skateboardforbrainrots.lua'
 };
 
 // Pobiera tekst z URL
